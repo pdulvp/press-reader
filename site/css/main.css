@@ -1,0 +1,8 @@
+:root {
+    --spin-color: rgb(23, 85, 156);
+    --spin-width: 32;
+}
+
+spin-progress {
+    margin: 10px;
+}
