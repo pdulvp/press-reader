@@ -51,6 +51,7 @@ function getCurrent(code, date) {
 }
 
 function getPages(code, date) {
+    date = dateh.formatDate(date, "-");
     return accessorh.getPages(code, date);
 }
 
@@ -146,7 +147,7 @@ function downloadComplet(code, date, type = null) {
 
     return new Promise((resolve, reject) => {
       if (fsh.fileExists(outputFile)) {
-        resolve("downloadComplete");
+        resolve({status : "downloadComplete"});
 
       } else {
         let download = findDownload(code, date);
@@ -198,10 +199,10 @@ function downloadComplet(code, date, type = null) {
                         download.inProgress = false;
                     }
                 });
-                resolve("startedDownload");
+                resolve({status : "startedDownload"});
             });
         } else {
-            resolve("inProgress");
+            resolve({status : "inProgress"});
         }
       }
     }).then(e => {

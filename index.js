@@ -26,43 +26,28 @@ var ContentTypes = {
 	jpg: 'image/jpg',
 	pdf: 'pdf',
 	ttf: 'font/ttf',
-	html: 'text/html',
+	html: 'text/html; charset=utf-8',
 	map: 'text/plain',
 	svg: 'image/svg+xml'
 };
 
 
 var processor = {
-  head: [],
-  body: [],
-  writeHead: (h) => { processor.head.push(h) },
-  write: (b) => { processor.body.push(b) },
+  head: {},
+  writeHead: (type, value) => { processor.head[type] = value },
   end: (res, lastContent, type) => { 
-    if (lastContent && type) {
-      res.writeHead(200, { "Content-Type": type });
-      res.end(lastContent, "binary");
-      processor.head = [];
-      processor.body = [];
-    } else {
-      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-      res.end(`<html><head>${processor.head.join("")}</head><body style="padding-top: 20px; padding-bottom: 20px" >${processor.body.join("")}</body></html>`) }
-      processor.head = [];
-      processor.body = [];
+    if (type) {
+      processor.writeHead("Content-Type", type);
     }
-}
-
-function writeResponse(res) {
-
-}
+    res.writeHead(200, processor.head);
+    res.end(lastContent, type == ContentTypes.html ? "utf-8": "binary");
+    processor.head = {};
+  }
+};
 
 function proceedRequest(request, res) {
   let url = new URL("https://" + hostname + request.url);
   console.log(url.pathname + " "+url.searchParams);
-
-  processor.writeHead(`<link href="main.css" rel="stylesheet"></link>`);
-  processor.writeHead(`<script type="application/javascript" src="CloseBtn.js" ></script>`);
-  processor.writeHead(`<script type="application/javascript" src="BookLink.js"></script>`);
-  processor.writeHead(`<script type="module" src="SpinProgress.mjs"></script>`);
 
   if (request.url == '/api.mjs') {
     processor.end(res, fs.readFileSync("site/api.mjs"), ContentTypes.js);
@@ -119,24 +104,19 @@ function proceedRequest(request, res) {
     let code = url.searchParams.get("code");
     let date = url.searchParams.get("date");
     domainh.getThumbnail(code, date).then(r => {
-      res.writeHead(200, {
-        "Content-Disposition": "attachment;filename=" + code + date + ".png"
-      });
+      processor.writeHead("Content-Disposition", "attachment;filename=" + code + date + ".png");
       processor.end(res, r, ContentTypes.png);
-    })
+    });
     
   } else if (url.pathname == '/readCurrent') {
     let code = url.searchParams.get("code");
     let date = url.searchParams.get("date");
     domainh.getComplet(code, date).then(r => {
-      if (r != "empty") {
-        res.writeHead(200, { 
-          "Content-Disposition": "attachment;filename=" + code + date + ".cbz"
-        });
+      if (r.status == undefined) {
+        processor.writeHead("Content-Disposition", "attachment;filename=" + code + date + ".cbz");
         processor.end(res, r, ContentTypes.cbz);
       } else {
-        processor.write(r);
-        processor.end(res);
+        processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
       }
     });
 
@@ -145,21 +125,18 @@ function proceedRequest(request, res) {
     let date = url.searchParams.get("date");
     let type = url.searchParams.get("type");
     domainh.downloadComplet(code, date, type).then(r => {
-      processor.write(r);
-      processor.end(res);
+      processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
     });
 
   } else if (url.pathname == '/stopDownload') {
     let code = url.searchParams.get("code");
     let date = url.searchParams.get("date");
     domainh.stopDownload(code, date).then(r => {
-      processor.write(r);
-      processor.end(res);
+      processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
     });
 
   } else {
-    processor.write(`Unknown url : ${request.url}`);
-    processor.end(res);
+    processor.end(res, JSON.stringify({status: "error", message: `Unknown url: ${request.url}`}, null, ""), ContentTypes.json);
   }
 }
 
@@ -171,7 +148,7 @@ server.on("request", (request, res) => {
   try {
     proceedRequest(request, res);
   } catch (e) {
-    res.end("<h2>An error occured</h2><p>"+e+"</p><pre>"+e.stack+"</pre>");
+    processor.end(res, JSON.stringify({status: "error", message: `An error occured : ${e}`}, null, ""), ContentTypes.json);
   }
 });
 

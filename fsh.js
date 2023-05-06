@@ -49,44 +49,6 @@ var fsh = {
             });
         });
     },
-    
-    append: function (filename, data) {
-		return new Promise(function(resolve, reject) {
-            if (!(typeof data === 'string' || data instanceof String)) {
-                data = JSON.stringify(data, null, " ");
-            }
-            if (!fs.existsSync(path.dirname(filename))){
-                fs.mkdirSync(path.dirname(filename), { recursive: true });
-            }
-            fs.appendFile(filename, data, 'UTF-8', function(err) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(data);
-                }
-            });
-        });
-	},
-	
-    writeIfChange: function (filename, data) {
-        if (!(typeof data === 'string' || data instanceof String)) {
-            data = JSON.stringify(data, null, " ");
-        }
-        if (!fs.existsSync(path.dirname(filename))){
-            fs.mkdirSync(path.dirname(filename), { recursive: true });
-        }
-        if (fsh.fileExists(filename)) {
-            return fsh.read(filename).then(e => {
-                if (e != data) {
-                    return fsh.write(filename, data);
-                } else {
-                    return Promise.resolve(filename);
-                }
-            })
-        } else {
-            return fsh.write(filename, data);
-        }
-    },
 
     read: function(filename) {
         return new Promise(function(resolve, reject) {
@@ -106,7 +68,6 @@ var fsh = {
 
         } catch (err) {
             if (err.code == 'ENOENT') {
-                console.log("File does not exist.");
                 return false;
             }
             return false;
