@@ -1,7 +1,7 @@
 
-const cacheh = require("@pdulvp/cacheh");
-const fsh = require("@pdulvp/fsh");
-const promiseh = require("@pdulvp/promiseh");
+const cacheh = require("./cacheh");
+const fsh = require("./fsh");
+const promiseh = require("./promiseh");
 const fs = require("fs");
 const dateh = require("./dateh");
 const ziph = require("./ziph");

@@ -4,15 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "run": "node index accessorh",
+    "run": "node index europresseh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@pdulvp/cacheh": "^1.0.0",
-    "@pdulvp/promiseh": "^1.0.0",
-    "adm-zip": "^0.5.10",
-    "gm": "^1.25.0"
+    "adm-zip": "^0.5.10"
   }
 }

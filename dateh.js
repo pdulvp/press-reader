@@ -13,19 +13,8 @@ function formatDate(date, separator = '') {
     return yyyy + separator + mm + separator + dd;
   }
   
-function toReadable(date) {
-    const date2 = new Date(formatDate(date, '-'));
-    // request a weekday along with a long date
-    const options = {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-    };
-  return date2.toLocaleDateString("fr-FR", options);
-}
-  var dateh = {
-    formatDate: formatDate, 
-    toReadable: toReadable,
+var dateh = {
+  formatDate: formatDate, 
 }
 
 module.exports = dateh;
