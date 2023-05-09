@@ -1,6 +1,14 @@
 class BookLink extends HTMLElement {
     
   connectedCallback() {
+    const stopHandler = function(event) {
+      console.log('event target', event.target)
+    }
+    
+    const downloadHandler = function(event) {
+      console.log('event target', event.target)
+    }
+
     let status = this.getAttribute('status');
     let code = this.getAttribute('code');
     let date = this.getAttribute('date');
@@ -8,43 +16,46 @@ class BookLink extends HTMLElement {
     let current = this.getAttribute('current');
     let total = this.getAttribute('total');
     
-    let links = [];
-    if (status != "empty") links.push(`<a href="/readCurrent?code=${code}&date=${date}">read</a>`);
-    if (status != "complete") links.push(`<a href="/downloadCurrent?code=${code}&date=${date}">download</a> (<a href="/downloadCurrent?code=${code}&date=${date}&type=full">full</a>)`);
-    if (status == "in progress") links.push(`<a href="/stopDownload?code=${code}&date=${date}">stop</a>`);
-    
-    if (current != "undefined" && total != "undefined" ) {
-      let percent = parseInt((parseInt(current) / parseInt(total)) * 100);
-      links.push(`<spin-progress class="spin-warn" text="${current}" percent="${percent}"></spin-progress>`);
-    }
-    if (status == "complete") {
-      links.push(`<spin-progress class="spin-warn" text="✔" percent="100"></spin-progress>`);
-    }
-
     let img = this.shadowRoot.querySelector("img");
     img.src = `/thumb?code=${code}&date=${date}`;
     img.style = "border: 1px solid gray; " + (status == "empty" ? "filter:saturate(-0)": "");
-    if (status == "empty") {
-      img.onclick = function(e) {
-        fetch(`/downloadCurrent?code=${code}&date=${date}&type=cover`).then(e => {
-          setTimeout(() => {
-            img.src = `/thumb?code=${code}&date=${date}&time=` + new Date().getTime();
-            img.style = "border: 1px solid gray;";
-          }, 10000);
-        });
-      }
+    img.onclick = function(e) {
+      document.getElementById("book-side-panel").setAttribute("code", code);
+      document.getElementById("book-side-panel").setAttribute("date", date);
+
+      document.getElementById("book-side-panel").setAttribute("status", status);
+      document.getElementById("book-side-panel").setAttribute("current", current);
+      document.getElementById("book-side-panel").setAttribute("total", total);
+
+      document.getElementById("book-side-panel").open = true;
+      document.getElementById("background-panel").open = true;
     }
+    
     this.shadowRoot.querySelectorAll("a")[0].href = `/read?code=${this.getAttribute('code')}&date=${this.getAttribute('date')}`;
     this.shadowRoot.querySelectorAll("a")[0].textContent = this.getAttribute('name');
     this.shadowRoot.querySelectorAll("span")[1].textContent = this.getAttribute('readableDate');
     this.shadowRoot.querySelectorAll("span")[2].innerHTML = links.join(" - ");
+
+    let download = this.shadowRoot.querySelector("a.download");
+    download.onclick = function(e) {
+      fetch(`/api/download?code=${code}&date=${date}`).then(e => {
+        console.log(e);
+      });
+      //href="/api/download?code=${code}&date=${date}"
+    }
+
+    let downloadFull = this.shadowRoot.querySelector("a.download-full");
+    downloadFull.onclick = function(e) {
+      fetch(`/api/download?code=${code}&date=${date}&type=full`).then(e => {
+        console.log(e);
+      });
+      //href="/api/download?code=${code}&date=${date}"
+    }
+
   }
 
   constructor(){
     super();
-      const clickHandler = function(event) {
-        console.log('event target', event.target)
-      }
       
       const shadow = this.attachShadow({mode: 'open'});
       

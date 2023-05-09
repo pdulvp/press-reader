@@ -4,9 +4,27 @@
     <script type="application/javascript" src="CloseBtn.js" ></script>
     <script type="application/javascript" src="BookLink.js"></script>
     <script type="module" src="SpinProgress.mjs"></script>
+    <script type="module" src="NavHeader.mjs"></script>
+    <script type="module" src="SidePanel.mjs"></script>
+    <script type="module" src="BackgroundPanel.mjs"></script>
+    <script type="module" src="DownloadsPanel.mjs"></script>
+    <script type="module" src="BookPanel.mjs"></script>
+    <script type="module" src="ArchivesPanel.mjs"></script>
 </head>
 <body>
     <script type="module" src="index.mjs"></script>
+    <background-panel id="background-panel" close="nav-side-panel book-side-panel"></background-panel>
+    <nav-header expand="nav-side-panel background-panel">
+        <a slot="content" href="/">List</a>
+        <a slot="content" href="/debug">Debug</a>
+    </nav-header>
+    <side-panel id="nav-side-panel">
+        <downloads-panel slot="panel"></downloads-panel>
+    </side-panel>
+    <side-panel id="book-side-panel">
+        <book-panel slot="panel"></book-panel>
+        <archives-panel slot="panel"></archives-panel>
+    </side-panel>
     <div id="content"></div>
 </body>
 </html>

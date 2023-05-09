@@ -61,6 +61,12 @@ function proceedRequest(request, res) {
   } else if (request.url == '/BookLink.js') {
     processor.end(res, fs.readFileSync("site/customElements/BookLink.js"), ContentTypes.js);
     
+  } else if (request.url == '/BookPanel.mjs') {
+    processor.end(res, fs.readFileSync("site/customElements/BookPanel.mjs"), ContentTypes.mjs);
+    
+  } else if (request.url == '/ArchivesPanel.mjs') {
+    processor.end(res, fs.readFileSync("site/customElements/ArchivesPanel.mjs"), ContentTypes.mjs);
+    
   } else if (request.url == '/dateh.mjs') {
     processor.end(res, fs.readFileSync("site/dateh.mjs"), ContentTypes.js);
     
@@ -70,18 +76,27 @@ function proceedRequest(request, res) {
   } else if (request.url == '/SpinProgress.mjs') {
     processor.end(res, fs.readFileSync("site/customElements/SpinProgress.mjs"), ContentTypes.mjs);
     
+  } else if (request.url == '/NavHeader.mjs') {
+    processor.end(res, fs.readFileSync("site/customElements/NavHeader.mjs"), ContentTypes.mjs);
+    
+  } else if (request.url == '/BackgroundPanel.mjs') {
+    processor.end(res, fs.readFileSync("site/customElements/BackgroundPanel.mjs"), ContentTypes.mjs);
+    
+  } else if (request.url == '/DownloadsPanel.mjs') {
+    processor.end(res, fs.readFileSync("site/customElements/DownloadsPanel.mjs"), ContentTypes.mjs);
+    
+  } else if (request.url == '/SidePanel.mjs') {
+    processor.end(res, fs.readFileSync("site/customElements/SidePanel.mjs"), ContentTypes.mjs);
+    
   } else if (request.url == '/SpinProgress.domain.mjs') {
     processor.end(res, fs.readFileSync("site/customElements/SpinProgress.domain.mjs"), ContentTypes.mjs);
     
   } else if (request.url == '/') {
     processor.end(res, fs.readFileSync("site/index.html"), ContentTypes.html);
 
-  } else if (url.pathname == '/archives') {
+  } else if (request.url == '/debug') {
     processor.end(res, fs.readFileSync("site/index.html"), ContentTypes.html);
 
-  } else if (url.pathname == '/read') {
-    processor.end(res, fs.readFileSync("site/index.html"), ContentTypes.html);
-    
   } else if (url.pathname == '/api/list') {
     domainh.getBooks().then(e => {
       processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
@@ -120,7 +135,7 @@ function proceedRequest(request, res) {
       }
     });
 
-  } else if (url.pathname == '/downloadCurrent') {
+  } else if (url.pathname == '/api/download') {
     let code = url.searchParams.get("code");
     let date = url.searchParams.get("date");
     let type = url.searchParams.get("type");
@@ -128,7 +143,12 @@ function proceedRequest(request, res) {
       processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
     });
 
-  } else if (url.pathname == '/stopDownload') {
+  } else if (url.pathname == '/api/downloads') {
+    domainh.getDownloads(null).then(r => {
+      processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
+    });
+
+  } else if (url.pathname == '/api/stop') {
     let code = url.searchParams.get("code");
     let date = url.searchParams.get("date");
     domainh.stopDownload(code, date).then(r => {

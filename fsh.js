@@ -34,7 +34,7 @@ var fsh = {
   
     write: function (filename, data) {
         return new Promise(function(resolve, reject) {
-            if (!(typeof data === 'string' || data instanceof String)) {
+            if (!(typeof data === 'string' || data instanceof String || data instanceof Buffer)) {
                 data = JSON.stringify(data, null, " ");
             }
             if (!fs.existsSync(path.dirname(filename))){

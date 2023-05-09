@@ -6,3 +6,20 @@
 spin-progress {
     margin: 10px;
 }
+
+html,body {
+    margin: 0px;
+    padding: 0px;
+}
+
+nav-header a {
+    text-transform: uppercase;
+    text-decoration: none;
+    color: rgb(100,50,50);
+    font-family: Segoe UI;
+    font-weight: bold;
+}
+
+side-panel ul {
+    list-style-type: none;
+}

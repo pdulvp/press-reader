@@ -199,7 +199,7 @@ function downloadComplet(code, date, type = null) {
                         download.inProgress = false;
                     }
                 });
-                resolve({status : "startedDownload"});
+                resolve({status : "inProgress"});
             });
         } else {
             resolve({status : "inProgress"});
@@ -241,7 +241,7 @@ var domainh = {
     downloadComplet: downloadComplet,
     stopDownload: stopDownload,
     getThumbnail: getThumbnail, 
-    getDownloads: (code) => { return currentDownloads.filter(c => c.code == code) },
+    getDownloads: (code) => { return Promise.resolve(currentDownloads.filter(c => code == null || c.code == code)); },
     getStatus: getStatus
 }
 
