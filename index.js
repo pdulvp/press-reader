@@ -49,47 +49,23 @@ function proceedRequest(request, res) {
   let url = new URL("https://" + hostname + request.url);
   console.log(url.pathname + " "+url.searchParams);
 
+  let customElements = ["BookLink", "BookPanel", "ArchivesPanel", "SpinProgress", "SpinProgress.domain", "NavHeader", "BackgroundPanel", "DownloadsPanel", "SidePanel"];
+  let file = request.url.substring(1, request.url.length - 4);
+  
   if (request.url == '/api.mjs') {
     processor.end(res, fs.readFileSync("site/api.mjs"), ContentTypes.js);
 
   } else if (request.url == '/index.mjs') {
     processor.end(res, fs.readFileSync("site/index.mjs"), ContentTypes.js);
 
-  } else if (request.url == '/CloseBtn.js') {
-    processor.end(res, fs.readFileSync("site/customElements/CloseBtn.js"), ContentTypes.js);
-
-  } else if (request.url == '/BookLink.js') {
-    processor.end(res, fs.readFileSync("site/customElements/BookLink.js"), ContentTypes.js);
-    
-  } else if (request.url == '/BookPanel.mjs') {
-    processor.end(res, fs.readFileSync("site/customElements/BookPanel.mjs"), ContentTypes.mjs);
-    
-  } else if (request.url == '/ArchivesPanel.mjs') {
-    processor.end(res, fs.readFileSync("site/customElements/ArchivesPanel.mjs"), ContentTypes.mjs);
+  } else if (customElements.includes(file)) {
+    processor.end(res, fs.readFileSync("site/customElements/"+file+".mjs"), ContentTypes.mjs);
     
   } else if (request.url == '/dateh.mjs') {
     processor.end(res, fs.readFileSync("site/dateh.mjs"), ContentTypes.js);
     
   } else if (request.url == '/main.css') {
     processor.end(res, fs.readFileSync("site/css/main.css"), ContentTypes.css);
-    
-  } else if (request.url == '/SpinProgress.mjs') {
-    processor.end(res, fs.readFileSync("site/customElements/SpinProgress.mjs"), ContentTypes.mjs);
-    
-  } else if (request.url == '/NavHeader.mjs') {
-    processor.end(res, fs.readFileSync("site/customElements/NavHeader.mjs"), ContentTypes.mjs);
-    
-  } else if (request.url == '/BackgroundPanel.mjs') {
-    processor.end(res, fs.readFileSync("site/customElements/BackgroundPanel.mjs"), ContentTypes.mjs);
-    
-  } else if (request.url == '/DownloadsPanel.mjs') {
-    processor.end(res, fs.readFileSync("site/customElements/DownloadsPanel.mjs"), ContentTypes.mjs);
-    
-  } else if (request.url == '/SidePanel.mjs') {
-    processor.end(res, fs.readFileSync("site/customElements/SidePanel.mjs"), ContentTypes.mjs);
-    
-  } else if (request.url == '/SpinProgress.domain.mjs') {
-    processor.end(res, fs.readFileSync("site/customElements/SpinProgress.domain.mjs"), ContentTypes.mjs);
     
   } else if (request.url == '/') {
     processor.end(res, fs.readFileSync("site/index.html"), ContentTypes.html);
