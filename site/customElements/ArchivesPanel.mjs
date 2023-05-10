@@ -8,7 +8,7 @@ class ArchivesPanel extends HTMLElement {
     let result = this.archives.map(d => {
       return `
       <li>
-        <img width="120px" code="${d.code}" date="${d.date}" status="${d.status.status}" current="${d.status.current}" total="${d.status.total}" src="/thumb?code=${d.code}&date=${d.date}"></img>
+        <img width="120px" code="${d.code}" date="${d.date}" status="${d.status}" current="${d.current}" total="${d.total}" src="/thumb?code=${d.code}&date=${d.date}"></img>
         <span>${d.date}</span>
       </li>`;
     }).join("");

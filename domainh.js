@@ -22,8 +22,12 @@ function findDownload(code, date, create = true) {
 
 function getBooks() {
     return accessorh.getBooks().then(result => {
-      return Promise.all(result.map(r => getStatus(r.code, r.date))).then(res => {
-        result.forEach((v, i) => result[i].status = res[i]);
+      return Promise.all(result.map(r => getStatus(r.code, r.latest.date))).then(res => {
+        result.forEach((v, i) => {
+            result[i].latest.status = res[i].status,
+            result[i].latest.current = res[i].current,
+            result[i].latest.total = res[i].total
+        });
         return Promise.resolve(result)
       });
     });
@@ -34,7 +38,11 @@ function getArchives(code) {
     return new Promise((resolve, reject) => {
     accessorh.getArchives(code).then(dates => {
         Promise.all(dates.map(r => getStatus(code, r.date))).then(res => {
-            dates.forEach((v, i) => dates[i].status = res[i]);
+            dates.forEach((v, i) => {
+                dates[i].status = res[i].status,
+                dates[i].current = res[i].current,
+                dates[i].total = res[i].total
+            });
             resolve(dates);
           });
         });

@@ -49,7 +49,7 @@ function proceedRequest(request, res) {
   let url = new URL("https://" + hostname + request.url);
   console.log(url.pathname + " "+url.searchParams);
 
-  let customElements = ["BookLink", "BookPanel", "ArchivesPanel", "SpinProgress", "SpinProgress.domain", "NavHeader", "BackgroundPanel", "DownloadsPanel", "SidePanel"];
+  let customElements = ["BooksList", "BookLink", "BookPanel", "ArchivesPanel", "SpinProgress", "SpinProgress.domain", "NavHeader", "BackgroundPanel", "DownloadsPanel", "SidePanel"];
   let file = request.url.substring(1, request.url.length - 4);
   
   if (request.url == '/api.mjs') {

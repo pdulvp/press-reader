@@ -1,14 +1,7 @@
 class BookLink extends HTMLElement {
     
   connectedCallback() {
-    const stopHandler = function(event) {
-      console.log('event target', event.target)
-    }
     
-    const downloadHandler = function(event) {
-      console.log('event target', event.target)
-    }
-
     let status = this.getAttribute('status');
     let code = this.getAttribute('code');
     let date = this.getAttribute('date');
@@ -35,22 +28,6 @@ class BookLink extends HTMLElement {
     this.shadowRoot.querySelectorAll("a")[0].textContent = this.getAttribute('name');
     this.shadowRoot.querySelectorAll("span")[1].textContent = this.getAttribute('readableDate');
     this.shadowRoot.querySelectorAll("span")[2].innerHTML = links.join(" - ");
-
-    let download = this.shadowRoot.querySelector("a.download");
-    download.onclick = function(e) {
-      fetch(`/api/download?code=${code}&date=${date}`).then(e => {
-        console.log(e);
-      });
-      //href="/api/download?code=${code}&date=${date}"
-    }
-
-    let downloadFull = this.shadowRoot.querySelector("a.download-full");
-    downloadFull.onclick = function(e) {
-      fetch(`/api/download?code=${code}&date=${date}&type=full`).then(e => {
-        console.log(e);
-      });
-      //href="/api/download?code=${code}&date=${date}"
-    }
 
   }
 
