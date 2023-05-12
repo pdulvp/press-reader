@@ -186,10 +186,12 @@ function downloadComplet(code, date, type = null) {
                     return accessorh.fetchImage(imageFile, imageId).then(tt => {
                         if (e[0] == imageId) {
                             return new Promise((resolve2, reject) => {
-                                let thumb = `${folder}/thumbnail.png`;
-                                fs.copyFileSync(imageFile, thumb);
-                                let mainThumb = `${folder}/../thumbnail.png`;
-                                fs.copyFileSync(imageFile, mainThumb);
+                                if (fsh.fileExists(imageFile)) {
+                                    let thumb = `${folder}/thumbnail.png`;
+                                    fs.copyFileSync(imageFile, thumb);
+                                    let mainThumb = `${folder}/../thumbnail.png`;
+                                    fs.copyFileSync(imageFile, mainThumb);
+                                }
                                 resolve2(true);
                             });
                         } else {

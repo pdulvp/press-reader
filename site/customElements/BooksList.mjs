@@ -22,9 +22,9 @@ class BooksList extends HTMLElement {
         this.shadowRoot.querySelector(".list").innerHTML = ul;
       }
       
+      let i=0;
       let result2 = Object.keys(groups).map(k => {
-        let deg = ((k.charCodeAt(0) * 8+k.charCodeAt(1) * 1 + 20)) % 360;
-        return `<li group="${k}" ${selectedGroup == k ? "selected=true" : ""}  style="filter: hue-rotate(${deg}deg);" class="button">${k}</li>`;
+        return `<li group="${k}" ${selectedGroup == k ? "selected=true" : ""} class="button button-${i++}" >${k}</li>`;
       }).join("");
       let ul2 = `<ul class="groups">`+result2+`</ul>`;
       this.shadowRoot.querySelector(".groups").innerHTML = ul2;
@@ -51,16 +51,36 @@ class BooksList extends HTMLElement {
       <style>
         .button {
           padding: 10px;
-          background-color: lightblue;
           border-radius: 5px;
           flex-basis: 150px; 
           flex-grow: 0; 
           flex-shrink: 0;
+          font-family: Segoe UI;
+          color: white;
+          font-weight: bold;
           border: 2px solid lightgray;
         }
         .button[selected] {
           border: 2px solid rgb(100,50,50);
         }
+
+        .button-0 { background-color: #59AAC7; }
+        .button-1 { background-color: #BE72AD; }
+        .button-2 { background-color: #849A7B; }
+        .button-3 { background-color: #545E7E; }
+        .button-4 { background-color: #EF9A9A; }
+        .button-5 { background-color: #CDC598; }
+        .button-6 { background-color: #F3D482; }
+        .button-7 { background-color: #88C9C3; }
+        .button-8 { background-color: #6A596A; }
+        .button-9 { background-color: #CBC75D; }
+        .button-10 { background-color: #8690E4; }
+        .button-11 { background-color: #83B594; }
+        .button-12 { background-color: #A46161; }
+        .button-13 { background-color: #DC5F2F; }
+        .button-14 { background-color: #B7694C; }
+        .button-15 { background-color: #932800; }
+
         .books {
           margin-left: 60px; 
           margin-right: 60px; 

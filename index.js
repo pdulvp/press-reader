@@ -15,32 +15,31 @@ const domainh = require("./domainh")(accessorh);
 http = require("http");
 
 var ContentTypes = { 
-	cbz: 'application/zip',
-	cjs: 'text/javascript',
-	mjs: 'text/javascript',
-	js: 'text/javascript',
-	css: 'text/css',
-	woff2: 'font/woff2',
-	json: 'application/json',
-	png: 'image/png',
-	jpg: 'image/jpg',
-	pdf: 'pdf',
-	ttf: 'font/ttf',
-	html: 'text/html; charset=utf-8',
-	map: 'text/plain',
-	svg: 'image/svg+xml'
+	cbz:   { contentType: 'application/zip', encoding: "binary" },
+	cjs:   { contentType: 'text/javascript', encoding: "utf-8" },
+	mjs:   { contentType: 'text/javascript', encoding: "utf-8" },
+	js:    { contentType: 'text/javascript', encoding: "utf-8" },
+	css:   { contentType: 'text/css', encoding: "utf-8" },
+	woff2: { contentType: 'font/woff2', encoding: "binary" },
+	json:  { contentType: 'application/json', encoding: "utf-8" },
+	png:   { contentType: 'image/png', encoding: "binary" },
+	jpg:   { contentType: 'image/jpg', encoding: "binary" },
+	pdf:   { contentType: 'pdf', encoding: "binary" },
+	ttf:   { contentType: 'font/ttf', encoding: "binary" },
+	html:  { contentType: 'text/html; charset=utf-8', encoding: "utf-8" },
+	map:   { contentType: 'text/plain', encoding: "utf-8" },
+	svg:   { contentType: 'image/svg+xml', encoding: "utf-8" },
 };
-
 
 var processor = {
   head: {},
   writeHead: (type, value) => { processor.head[type] = value },
   end: (res, lastContent, type) => { 
     if (type) {
-      processor.writeHead("Content-Type", type);
+      processor.writeHead("Content-Type", type.contentType);
     }
     res.writeHead(200, processor.head);
-    res.end(lastContent, type == ContentTypes.html ? "utf-8": "binary");
+    res.end(lastContent, type.encoding);
     processor.head = {};
   }
 };
