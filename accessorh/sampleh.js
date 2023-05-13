@@ -74,7 +74,7 @@ var sampleDomainh = {
     return Promise.resolve(result);
   },
 
-  fetchImage: (imageFile, imageId) => {
+  getImage: (imageId) => {
     let id = imageId;
     return fetch(`https://picsum.photos/id/${id}/200/300`, {
         "headers": {
@@ -98,14 +98,9 @@ var sampleDomainh = {
       "mode": "cors",
       "credentials": "include"
       }).then(response => {
-        return response.arrayBuffer()
-      }).then((arrayBuffer) => {
-        return fsh.write(imageFile, Buffer.from(arrayBuffer)).then(e => {
-          console.log('The file has been saved!');
-        }).catch(e => {
-          console.log(e);
-          console.log(err);
-        })
+        return response.arrayBuffer();
+      }).then(arrayBuffer => {
+        return Promise.resolve(Buffer.from(arrayBuffer));
       });
   }
 }

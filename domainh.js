@@ -183,20 +183,23 @@ function downloadComplet(code, date, type = null) {
                     download.current++;
                     console.log(download);
 
-                    return accessorh.fetchImage(imageFile, imageId).then(tt => {
-                        if (e[0] == imageId) {
-                            return new Promise((resolve2, reject) => {
-                                if (fsh.fileExists(imageFile)) {
-                                    let thumb = `${folder}/thumbnail.png`;
-                                    fs.copyFileSync(imageFile, thumb);
-                                    let mainThumb = `${folder}/../thumbnail.png`;
-                                    fs.copyFileSync(imageFile, mainThumb);
-                                }
-                                resolve2(true);
-                            });
-                        } else {
-                            return Promise.resolve(true);
-                        }
+                    return accessorh.getImage(imageId).then(tt => {
+                        return fsh.write(imageFile, tt).then(e => {
+                            console.log('The file has been saved!');
+                            if (e[0] == imageId) {
+                                return new Promise((resolve2, reject) => {
+                                    if (fsh.fileExists(imageFile)) {
+                                        let thumb = `${folder}/thumbnail.png`;
+                                        fs.copyFileSync(imageFile, thumb);
+                                        let mainThumb = `${folder}/../thumbnail.png`;
+                                        fs.copyFileSync(imageFile, mainThumb);
+                                    }
+                                    resolve2(true);
+                                });
+                            } else {
+                                return Promise.resolve(true);
+                            }
+                        });
                     }).then(promiseh.wait);
                 
                 }).then(ee => {

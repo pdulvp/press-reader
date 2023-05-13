@@ -18,7 +18,7 @@ A domain adaptor must provides this following API:
 
 `getArchives: (code) => [ code, date ]`
 
-`fetchImage (imageFile, idPage)`
+`getImage (idPage)`
 
 ### Installation
 
