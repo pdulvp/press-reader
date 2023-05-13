@@ -48,7 +48,8 @@ function proceedRequest(request, res) {
   let url = new URL("https://" + hostname + request.url);
   console.log(url.pathname + " "+url.searchParams);
 
-  let customElements = ["BooksList", "BookLink", "BookPanel", "ArchivesPanel", "SpinProgress", "SpinProgress.domain", "NavHeader", "BackgroundPanel", "DownloadsPanel", "SidePanel"];
+  let customElements = ["customElements/BooksList", "customElements/BookLink", "customElements/BookPanel", "customElements/ArchivesPanel", "customElements/SpinProgress", 
+  "customElements/SpinProgress.domain", "customElements/NavHeader", "customElements/BackgroundPanel", "customElements/DownloadsPanel", "customElements/SidePanel"];
   let file = request.url.substring(1, request.url.length - 4);
   
   if (request.url == '/api.mjs') {
@@ -58,12 +59,12 @@ function proceedRequest(request, res) {
     processor.end(res, fs.readFileSync("site/index.mjs"), ContentTypes.js);
 
   } else if (customElements.includes(file)) {
-    processor.end(res, fs.readFileSync("site/customElements/"+file+".mjs"), ContentTypes.mjs);
+    processor.end(res, fs.readFileSync("site/"+file+".mjs"), ContentTypes.mjs);
     
   } else if (request.url == '/dateh.mjs') {
     processor.end(res, fs.readFileSync("site/dateh.mjs"), ContentTypes.js);
     
-  } else if (request.url == '/main.css') {
+  } else if (request.url == '/css/main.css') {
     processor.end(res, fs.readFileSync("site/css/main.css"), ContentTypes.css);
     
   } else if (request.url == '/') {
