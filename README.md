@@ -2,9 +2,9 @@
 
 This application is useful when a press service provider is images for each pages of a press newspaper. It will download images and generates a PDF from it.
 
-## Current UI
+## UI
 
-![image](https://user-images.githubusercontent.com/28950124/236561407-4ceb3f50-1b75-47ed-bee4-900e9457519a.png)
+![image](https://github.com/pdulvp/press-reader/assets/28950124/0bdcf5c2-ab4e-4aca-a66d-f11e111d72f3)
 
 ## Domain Adaptor
 
