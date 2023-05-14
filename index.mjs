@@ -12,10 +12,13 @@ if (!fs.existsSync("./"+process.argv[2])) {
 
 const module = await import("./"+process.argv[2]);
 let accessorh = module.default;
+console.log("accessorh");
 console.log(accessorh);
 
-import fDomainh from "./domainh.js";
+import fDomainh from "./domainh.mjs";
 var domainh = fDomainh(accessorh);
+console.log("domainh");
+console.log(domainh);
 
 var ContentTypes = { 
 	cbz:   { contentType: 'application/zip', encoding: "binary" },
@@ -70,8 +73,8 @@ function proceedRequest(request, res) {
   } else if (request.url == '/css/main.css') {
     processor.end(res, fs.readFileSync("site/css/main.css"), ContentTypes.css);
     
-  } else if (request.url == '/accessorh/sampleh.js') {
-    processor.end(res, fs.readFileSync("site/accessorh/sampleh.js"), ContentTypes.js);
+  } else if (request.url == '/accessorh/sampleh.mjs') {
+    processor.end(res, fs.readFileSync("site/accessorh/sampleh.mjs"), ContentTypes.js);
     
   } else if (request.url == '/') {
     processor.end(res, fs.readFileSync("site/index.html"), ContentTypes.html);

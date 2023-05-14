@@ -23,5 +23,6 @@ function toReadable(date) {
   return date2.toLocaleDateString("fr-FR", options);
 }
 export var dateh = {
+    formatDate: formatDate, 
     toReadable: toReadable
 }

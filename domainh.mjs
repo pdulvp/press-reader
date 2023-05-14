@@ -1,9 +1,9 @@
 
-const fsh = require("./fsh");
-const promiseh = require("./promiseh");
-const fs = require("fs");
-const dateh = require("./dateh");
-const ziph = require("./ziph");
+import fsh from "./fsh.js";
+import promiseh from "./promiseh.js";
+import fs from "fs";
+import { dateh } from "./site/dateh.mjs";
+import ziph from "./ziph.js";
 
 let currentDownloads = [];
 let accessorh = null;
@@ -256,7 +256,7 @@ var domainh = {
     getStatus: getStatus
 }
 
-module.exports = (accessor) => {
+export default function (accessor) {
     accessorh = accessor;
     return domainh;
 };
