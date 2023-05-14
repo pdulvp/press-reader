@@ -93,10 +93,10 @@ function proceedRequest(request, res) {
       processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
     });
 
-  } else if (url.pathname == '/api/read') {
+  } else if (url.pathname == '/api/status') {
     let code = url.searchParams.get("code");
     let date = url.searchParams.get("date");
-    domainh.getCurrent(code, date).then(e => {
+    domainh.getStatus(code, date).then(e => {
       processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
     });
 
@@ -124,7 +124,7 @@ function proceedRequest(request, res) {
     let code = url.searchParams.get("code");
     let date = url.searchParams.get("date");
     let type = url.searchParams.get("type");
-    domainh.downloadComplet(code, date, type).then(r => {
+    domainh.download(code, date, type).then(r => {
       processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
     });
 

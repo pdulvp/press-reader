@@ -46,15 +46,6 @@ function getArchives(code) {
         });
     });
 }
-function getCurrent(code, date) {
-    return getStatus(code, date).then(s => {
-        return Promise.resolve({
-            code: code, 
-            date: date,
-            status: s
-        });
-    });
-}
 
 function getPages(code, date) {
     date = dateh.formatDate(date, "-");
@@ -145,7 +136,7 @@ function stopDownload(code, date) {
     return Promise.resolve(true);
 }
 
-function downloadComplet(code, date, type = null) {
+function download(code, date, type = null) {
     date = dateh.formatDate(date, "-");
     let folder = `results/${code}/${date}`;
     let outputFile = `${folder}/${code}_${date}.cbz`;
@@ -223,16 +214,14 @@ function downloadComplet(code, date, type = null) {
   }
 
   function getThumbnail(code, date) {
-    let folder = `results/${code}`;
+    let thumb = `results/${code}/thumbnail.png`;
     if (date != null) {
         date = dateh.formatDate(date, "-");
-        folder += `/${date}`
+        thumb = `results/${code}/${date}/thumbnail.png`;
     }
-    let thumb = `${folder}/thumbnail.png`;
     if (!fsh.fileExists(thumb)) {
         thumb = `results/${code}/thumbnail.png`;
     }
-    
     if (!fsh.fileExists(thumb)) {
         thumb = "thumbnail.png";
     }
@@ -246,10 +235,9 @@ function downloadComplet(code, date, type = null) {
 
 var domainh = {
     getBooks: getBooks,
-    getCurrent: getCurrent,
     getArchives: getArchives,
     getComplet: getComplet,
-    downloadComplet: downloadComplet,
+    download: download,
     stopDownload: stopDownload,
     getThumbnail: getThumbnail, 
     getDownloads: (code) => { return Promise.resolve(currentDownloads.filter(c => code == null || c.code == code)); },
