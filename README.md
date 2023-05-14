@@ -12,15 +12,15 @@ To work properly, this website needs to provide an `adaptor` that will make the 
 
 A domain adaptor must provides this following API:
 
-`getBooks: [ code, group, latest { date }, name ]`
+`getBooks: [ { code, group, latest { date }, name }... ]`
   
-`getPages: (code, date) => [ { idPage } ]`
+`getPages: (code, date) => [ idPage... ]`
 
-`getArchives: (code) => [ code, date ]`
+`getArchives: (code) => [ { code, date}... ]`
 
-`getImage (idPage)`
+`getImage (idPage) => Buffer`
 
-`getThumbnail (code, date)`
+`getThumbnail (code, date) => Buffer`
 
 ### Installation
 
