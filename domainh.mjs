@@ -175,19 +175,7 @@ function download(code, date, type = null) {
                     return accessorh.getImage(imageId).then(tt => {
                         return fsh.write(imageFile, tt).then(e => {
                             console.log('The file has been saved!');
-                            if (e[0] == imageId) {
-                                return new Promise((resolve2, reject) => {
-                                    if (fsh.fileExists(imageFile)) {
-                                        let thumb = `${folder}/thumbnail.png`;
-                                        fs.copyFileSync(imageFile, thumb);
-                                        let mainThumb = `${folder}/../thumbnail.png`;
-                                        fs.copyFileSync(imageFile, mainThumb);
-                                    }
-                                    resolve2(true);
-                                });
-                            } else {
-                                return Promise.resolve(true);
-                            }
+                            return Promise.resolve(true);
                         });
                     }).then(promiseh.wait);
                 
@@ -214,23 +202,55 @@ function download(code, date, type = null) {
   }
 
   function getThumbnail(code, date) {
-    let thumb = `results/${code}/thumbnail.png`;
-    if (date != null) {
+    let thumb = undefined;
+    
+    return new Promise((resolve, reject) => {
+      if (date != null && date != "null" && code != null && code != "null") {
         date = dateh.formatDate(date, "-");
         thumb = `results/${code}/${date}/thumbnail.png`;
-    }
-    if (!fsh.fileExists(thumb)) {
-        thumb = `results/${code}/thumbnail.png`;
-    }
-    if (!fsh.fileExists(thumb)) {
-        thumb = "thumbnail.png";
-    }
-    return new Promise((resolve, reject) => {
-      fs.readFile(thumb, "binary", (err, data) => {
-          if (err) reject(err);
-          resolve(data);
-      });
-    });
+        if (fsh.fileExists(thumb)) {
+            resolve({status: "date", thumb: thumb})
+        }
+        getPages(code, date).then(e => {
+            let folder = `results/${code}/${date}`;
+            let imageId = e[0];
+            let imageFile = `${folder}/${imageId}.png`;
+            if (fsh.fileExists(imageFile)) {
+              fs.copyFileSync(imageFile, thumb);
+              let mainThumb = `${folder}/../thumbnail.png`;
+              fs.copyFileSync(imageFile, mainThumb);
+              resolve({status: "date", thumb: thumb})
+            }
+            reject();
+        });
+      } else {
+        reject();
+      }
+
+    }).catch(e => {
+        return new Promise((resolve, reject) => {
+            if (code != null && code != "null") {
+                thumb = `results/${code}/thumbnail.png`;
+                if (fsh.fileExists(thumb)) {
+                    resolve({status: "cover", thumb: thumb})
+                }
+            }
+            reject()
+        });
+
+    }).catch(e => {
+        return Promise.resolve({status: "default", thumb: `thumbnail.png`})
+
+    }).then(e => {
+        return new Promise((resolve, reject) => {
+            fs.readFile(e.thumb, "binary", (err, data) => {
+                if (err) reject(err);
+                resolve({ status: e.status, thumbnail: data });
+            });
+        });
+    })
+
+    
   }
 
 var domainh = {

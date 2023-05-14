@@ -105,7 +105,8 @@ function proceedRequest(request, res) {
     let date = url.searchParams.get("date");
     domainh.getThumbnail(code, date).then(r => {
       processor.writeHead("Content-Disposition", "attachment;filename=" + code + date + ".png");
-      processor.end(res, r, ContentTypes.png);
+      processor.writeHead("X-Thumbnail-Status", r.status);
+      processor.end(res, r.thumbnail, ContentTypes.png);
     });
     
   } else if (url.pathname == '/readCurrent') {
