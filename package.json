@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "run": "node index.mjs site/accessorh/sampleh.mjs",
+    "sample": "node index.mjs site/accessorh/sampleh.mjs",
     "test": "node --version"
   },
   "author": "",

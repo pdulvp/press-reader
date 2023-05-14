@@ -20,6 +20,8 @@ A domain adaptor must provides this following API:
 
 `getImage (idPage)`
 
+`getThumbnail (code, date)`
+
 ### Installation
 
 Install the adaptor `yourAdaptorh.js` in adaptorh folder and start `node index yourAdaptorh`

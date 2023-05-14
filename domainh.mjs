@@ -160,7 +160,6 @@ function download(code, date, type = null) {
                     }
                     let imageFile = `${folder}/${imageId}.png`;
                     download.current++;
-                    console.log(download);
 
                     return accessorh.getImage(imageId).then(tt => {
                         return fsh.write(imageFile, tt).then(e => {
@@ -199,35 +198,43 @@ function download(code, date, type = null) {
         date = dateh.formatDate(date, "-");
         thumb = `results/${code}/${date}/thumbnail.png`;
         if (fsh.fileExists(thumb)) {
-            resolve({status: "date", thumb: thumb})
-        } else if (fsh.fileExists(`results/${code}/${date}`)) {
-            getPages(code, date).then(e => {
-                console.log("getPages2");
-                console.log(e);
-                let imageId = e[0];
-                let imageFile = `results/${code}/${date}/${imageId}.png`;
-                if (fsh.fileExists(imageFile)) {
-                  fs.copyFileSync(imageFile, thumb);
-                  resolve({status: "date", thumb: thumb})
-                }
-                reject();
+            fs.readFile(thumb, "binary", (err, data) => {
+                resolve({ status: "date", thumbnail: data });
             });
         } else {
-            reject();
-        }
+            accessorh.getThumbnail(code, date).then(imageData => {
+              fs.writeFileSync(thumb, imageData);
+              thumb = `results/${code}/thumbnail.png`;
+              fs.writeFileSync(thumb, imageData);
+              resolve({status: "date", thumbnail: imageData});
+            }).catch(e => {
+                reject();
+            });
+        } 
         
       } else {
         reject();
       }
 
     }).catch(e => {
-        return Promise.resolve({status: "default", thumb: `thumbnail.png`})
-
-    }).then(e => {
         return new Promise((resolve, reject) => {
-            fs.readFile(e.thumb, "binary", (err, data) => {
-                if (err) reject(err);
-                resolve({ status: e.status, thumbnail: data });
+            if (code != null && code != "null") {
+                thumb = `results/${code}/thumbnail.png`;
+                if (fsh.fileExists(thumb)) {
+                    fs.readFile(thumb, "binary", (err, data) => {
+                        resolve({ status: "cover", thumbnail: data });
+                    });
+                } else {
+                    reject();
+                }
+            } else {
+                reject();
+            }
+        });
+    }).catch(e => {
+        return new Promise((resolve, reject) => {
+            fs.readFile(`thumbnail.png`, "binary", (err, data) => {
+                resolve({ status: "default", thumbnail: data });
             });
         });
     })

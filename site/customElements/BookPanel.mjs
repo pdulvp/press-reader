@@ -9,16 +9,18 @@ class BookPanel extends HTMLElement {
     let status = document.getElementById("book-side-panel").getAttribute("status");
     let current = document.getElementById("book-side-panel").getAttribute("current");
     let total = document.getElementById("book-side-panel").getAttribute("total");
-    img.src = `/thumb?code=${code}&date=${date}`;
-    img.style = "border: 1px solid gray; " + (status == "empty" ? "filter:saturate(-0)": "");
-    img.onclick = function(e) {
-      if (status == "empty") {
-        fetch(`/api/download?code=${code}&date=${date}&type=cover`).then(e => {
-          setTimeout(() => {
-            img.src = `/thumb?code=${code}&date=${date}&time=` + new Date().getTime();
-            img.style = "border: 1px solid gray;";
-          }, 10000);
-        });
+    if (code != "null" && date != "null") {
+      img.src = `/thumb?code=${code}&date=${date}`;
+      img.style = "border: 1px solid gray; " + (status == "empty" ? "filter:saturate(-0)": "");
+      img.onclick = function(e) {
+        if (status == "empty") {
+          fetch(`/api/download?code=${code}&date=${date}&type=cover`).then(e => {
+            setTimeout(() => {
+              img.src = `/thumb?code=${code}&date=${date}&time=` + new Date().getTime();
+              img.style = "border: 1px solid gray;";
+            }, 10000);
+          });
+        }
       }
     }
 

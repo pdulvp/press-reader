@@ -1,7 +1,7 @@
 
 import { dateh } from "../dateh.mjs"
 
-export default {
+var accessorh = {
   getBooks: () => {
     let result = [
        { code: "CITIES", name: "Cities", group: "Road", latest: { date: "2023-01-02" }, }, 
@@ -100,5 +100,14 @@ export default {
       }).then(arrayBuffer => {
         return Promise.resolve(Buffer.from(arrayBuffer));
       });
+  },
+  
+  getThumbnail: (code, date) => {
+    return accessorh.getPages(code, date).then(pages => {
+      let imageId = pages[0];
+      return accessorh.getImage(imageId);
+    });
   }
 }
+
+export default accessorh;
