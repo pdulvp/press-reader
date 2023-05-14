@@ -38,6 +38,21 @@ var api = {
         return fetch(`api/downloads`).then(e => {
             return e.json();
         });
+    },
+    thumb: function(code, date) {
+        return fetch(`thumb?code=${code}&date=${date}`).then(e => {
+            return new Promise(function(resolve, reject) {
+                e.arrayBuffer().then(arrayBuffer => {
+                    resolve({ status: e.headers.get("x-thumbnail-status"), arrayBuffer: arrayBuffer })
+                })
+            });
+        }).then(value => {
+            var base64 = btoa(
+                new Uint8Array(value.arrayBuffer)
+                  .reduce((data, byte) => data + String.fromCharCode(byte), '')
+              );
+            return Promise.resolve({ status: value.status, thumbnail: "data:image/png;base64, "+base64 } );
+        });
     }
 };
 export { api }

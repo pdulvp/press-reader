@@ -8,7 +8,7 @@ class ArchivesPanel extends HTMLElement {
     let result = this.archives.map(d => {
       return `
       <li>
-        <img width="120px" code="${d.code}" date="${d.date}" status="${d.status.status}" current="${d.status.current}" total="${d.status.total}" src="/thumb?code=${d.code}&date=${d.date}"></img>
+        <img width="120px" code="${d.code}" date="${d.date}" status="${d.status.status}" current="${d.status.current}" total="${d.status.total}"></img>
         <span>${d.date}</span>
       </li>`;
     }).join("");
@@ -19,9 +19,14 @@ class ArchivesPanel extends HTMLElement {
     let imgs = this.shadowRoot.querySelectorAll("img");
     imgs.forEach(img => {
       let status = img.getAttribute("status");
-      img.style = "border: 1px solid gray; " + (status == "empty" ? "filter:saturate(-0)": "");
-      img.onclick = function(event) {
+      let code = img.getAttribute("code");
+      let date = img.getAttribute("date");
+      api.thumb(code, date).then(data => {
+        img.src = data.thumbnail;
+        img.style = "border: 1px solid gray; " + (data.status == "cover" ? "filter:saturate(-0)": "");
+      });
 
+      img.onclick = function(event) {
         document.getElementById("book-side-panel").setAttribute("code", event.target.getAttribute("code"));
         document.getElementById("book-side-panel").setAttribute("date", event.target.getAttribute("date"));
         document.getElementById("book-side-panel").setAttribute("current", event.target.getAttribute("current"));

@@ -1,3 +1,5 @@
+import { api } from "../api.mjs"
+
 class BookLink extends HTMLElement {
     
   connectedCallback() {
@@ -10,8 +12,11 @@ class BookLink extends HTMLElement {
     let total = this.getAttribute('total');
     
     let img = this.shadowRoot.querySelector("img");
-    img.src = `/thumb?code=${code}&date=${date}`;
-    img.style = "border: 1px solid gray; " + (status == "empty" ? "filter:saturate(-0)": "");
+    api.thumb(code, date).then(data => {
+      img.src = data.thumbnail;
+      img.style = "border: 1px solid gray; " + (data.status == "cover" ? "filter:saturate(-0)": "");
+    });
+
     img.onclick = function(e) {
       document.getElementById("book-side-panel").setAttribute("code", code);
       document.getElementById("book-side-panel").setAttribute("date", date);
@@ -27,7 +32,6 @@ class BookLink extends HTMLElement {
     this.shadowRoot.querySelectorAll("a")[0].href = `/read?code=${this.getAttribute('code')}&date=${this.getAttribute('date')}`;
     this.shadowRoot.querySelectorAll("a")[0].textContent = this.getAttribute('name');
     this.shadowRoot.querySelectorAll("span")[1].textContent = this.getAttribute('readableDate');
-    this.shadowRoot.querySelectorAll("span")[2].innerHTML = links.join(" - ");
 
   }
 
