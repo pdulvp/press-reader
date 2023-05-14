@@ -4,7 +4,7 @@ This application is useful when a press service provider is images for each page
 
 ## UI
 
-![image](https://github.com/pdulvp/press-reader/assets/28950124/0bdcf5c2-ab4e-4aca-a66d-f11e111d72f3)
+![image](https://github.com/pdulvp/press-reader/assets/28950124/42133d28-63bd-4381-b2b8-a9b61b37399c)
 
 ## Domain Adaptor
 
