@@ -100,6 +100,20 @@ function proceedRequest(request, res) {
       processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
     });
 
+  } else if (url.pathname == '/api/statuses') {
+    let body = [];
+    request.on('error', (err) => {
+      console.error(err);
+    }).on('data', (chunk) => {
+      body.push(chunk);
+    }).on('end', () => {
+      body = Buffer.concat(body).toString();
+      domainh.getStatuses(JSON.parse(body)).then(e => {
+        console.log(e);
+        processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
+      })
+    });
+    
   } else if (url.pathname == '/thumb') {
     let code = url.searchParams.get("code");
     let date = url.searchParams.get("date");

@@ -7,6 +7,12 @@ var api = {
         });
         //return sampleDomainh.getBooks();
     },
+    statuses: function(codes) {
+        return fetch(`api/statuses`, {
+            method: "POST", body: JSON.stringify(codes) }).then(e => {
+            return e.json();
+        });
+    },
     status: function(code, date) {
         return fetch(`api/status?code=${code}&date=${date}`).then(e => {
             return e.json();

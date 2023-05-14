@@ -64,12 +64,12 @@ var fsh = {
   
     fileExists: function(filename) {
         try {
-            return fs.statSync(filename).isFile();
-
-        } catch (err) {
-            if (err.code == 'ENOENT') {
-                return false;
+            if (fs.statSync(filename).isFile()) {
+                return true;
             }
+            fs.accessSync(filename, fs.constants.R_OK);
+            return true;
+        } catch (err) {
             return false;
         }
     },

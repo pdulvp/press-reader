@@ -4,36 +4,41 @@ import { dateh } from "../dateh.mjs"
 class BooksList extends HTMLElement {
   connectedCallback() {
     api.list().then(e => {
+      let oo = e.map(r => { return { code: r.code, date: r.latest.date }; });
+      api.statuses(oo).then(statuses => {
+        console.log(statuses);
 
-      let selectedGroup = this.getAttribute("group");
+        let selectedGroup = this.getAttribute("group");
 
-      let groups = {};
-      e.forEach(a => {
-          if (groups[a.group] == undefined) groups[a.group] = 0;
-          groups[a.group]++;
-      });
+        let groups = {};
+        e.forEach(a => {
+            if (groups[a.group] == undefined) groups[a.group] = 0;
+            groups[a.group]++;
+        });
 
-      if (selectedGroup != undefined) {
-        let result = e.filter(a => selectedGroup == undefined || a.group == selectedGroup).map(a => {
-            return `<li><book-link code="${a.code}" status="${a.latest.status}" current="${a.latest.current}" total="${a.latest.total}" date="${a.latest.date}" name="${a.name}" readableDate="${dateh.toReadable(a.latest.date)}"></book-link></li>`;
-        }).join("");
+        if (selectedGroup != undefined) {
+          let result = e.filter(a => selectedGroup == undefined || a.group == selectedGroup).map(a => {
+            let status = statuses.find(st => st.code == a.code && st.date == a.latest.date);
+            return `<li><book-link code="${a.code}" status="${status.status}" current="${status.current}" total="${status.total}" date="${a.latest.date}" name="${a.name}" readableDate="${dateh.toReadable(a.latest.date)}"></book-link></li>`;
+          }).join("");
 
-        let ul = `<ul class="books">`+result+`</ul>`;
-        this.shadowRoot.querySelector(".list").innerHTML = ul;
-      }
-      
-      let i=0;
-      let result2 = Object.keys(groups).map(k => {
-        return `<li group="${k}" ${selectedGroup == k ? "selected=true" : ""} class="button button-${i++}" >${k}</li>`;
-      }).join("");
-      let ul2 = `<ul class="groups">`+result2+`</ul>`;
-      this.shadowRoot.querySelector(".groups").innerHTML = ul2;
-
-      let dnd = this;
-      this.shadowRoot.querySelectorAll(".button").forEach(b => {
-        b.onclick = (event) => {
-          dnd.setAttribute("group", event.target.getAttribute("group"));
+          let ul = `<ul class="books">`+result+`</ul>`;
+          this.shadowRoot.querySelector(".list").innerHTML = ul;
         }
+        
+        let i=0;
+        let result2 = Object.keys(groups).map(k => {
+          return `<li group="${k}" ${selectedGroup == k ? "selected=true" : ""} class="button button-${i++}" >${k}</li>`;
+        }).join("");
+        let ul2 = `<ul class="groups">`+result2+`</ul>`;
+        this.shadowRoot.querySelector(".groups").innerHTML = ul2;
+
+        let dnd = this;
+        this.shadowRoot.querySelectorAll(".button").forEach(b => {
+          b.onclick = (event) => {
+            dnd.setAttribute("group", event.target.getAttribute("group"));
+          }
+        });
       });
     });
   }

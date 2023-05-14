@@ -19,35 +19,16 @@ function findDownload(code, date, create = true) {
 }
 
 function getBooks() {
-    return accessorh.getBooks().then(result => {
-      return Promise.all(result.map(r => getStatus(r.code, r.latest.date))).then(res => {
-        result.forEach((v, i) => {
-            result[i].latest.status = res[i].status,
-            result[i].latest.current = res[i].current,
-            result[i].latest.total = res[i].total
-        });
-        return Promise.resolve(result)
-      });
-    });
+    return accessorh.getBooks();
 }
 
 function getArchives(code) {
     //window.parent.location.href='/Login?ErrorCode=1';
-    return new Promise((resolve, reject) => {
-    accessorh.getArchives(code).then(dates => {
-        Promise.all(dates.map(r => getStatus(code, r.date))).then(res => {
-            dates.forEach((v, i) => {
-                dates[i].status = res[i].status,
-                dates[i].current = res[i].current,
-                dates[i].total = res[i].total
-            });
-            resolve(dates);
-          });
-        });
-    });
+    return accessorh.getArchives(code);
 }
 
 function getPages(code, date) {
+    console.log("getPages"+code+" "+date);
     date = dateh.formatDate(date, "-");
     return accessorh.getPages(code, date);
 }
@@ -55,6 +36,15 @@ function getPages(code, date) {
 function searchDownloadedPages(folder) {
     return fsh.getFiles(folder).then(files => {
         return Promise.resolve(files.filter(file => file.endsWith(".png") && !(file.endsWith("thumbnail.png"))));
+    });
+}
+
+function getStatuses(codes) {
+    return Promise.all(codes.map(r => getStatus(r.code, r.date))).then(res => {
+        codes.forEach((v, i) => {
+            codes[i].status = res[i];
+        });
+        return Promise.resolve(codes);
     });
 }
 
@@ -154,7 +144,7 @@ function download(code, date, type = null) {
             getPages(code, date).then(e => {
                 download.total = e.length;
 
-                ea = e.filter(r => {
+                let ea = e.filter(r => {
                     let imageFile = `${folder}/${r}.png`;
                     return !fsh.fileExists(imageFile);
                 });
@@ -210,33 +200,25 @@ function download(code, date, type = null) {
         thumb = `results/${code}/${date}/thumbnail.png`;
         if (fsh.fileExists(thumb)) {
             resolve({status: "date", thumb: thumb})
-        }
-        getPages(code, date).then(e => {
-            let folder = `results/${code}/${date}`;
-            let imageId = e[0];
-            let imageFile = `${folder}/${imageId}.png`;
-            if (fsh.fileExists(imageFile)) {
-              fs.copyFileSync(imageFile, thumb);
-              let mainThumb = `${folder}/../thumbnail.png`;
-              fs.copyFileSync(imageFile, mainThumb);
-              resolve({status: "date", thumb: thumb})
-            }
+        } else if (fsh.fileExists(`results/${code}/${date}`)) {
+            getPages(code, date).then(e => {
+                console.log("getPages2");
+                console.log(e);
+                let imageId = e[0];
+                let imageFile = `results/${code}/${date}/${imageId}.png`;
+                if (fsh.fileExists(imageFile)) {
+                  fs.copyFileSync(imageFile, thumb);
+                  resolve({status: "date", thumb: thumb})
+                }
+                reject();
+            });
+        } else {
             reject();
-        });
+        }
+        
       } else {
         reject();
       }
-
-    }).catch(e => {
-        return new Promise((resolve, reject) => {
-            if (code != null && code != "null") {
-                thumb = `results/${code}/thumbnail.png`;
-                if (fsh.fileExists(thumb)) {
-                    resolve({status: "cover", thumb: thumb})
-                }
-            }
-            reject()
-        });
 
     }).catch(e => {
         return Promise.resolve({status: "default", thumb: `thumbnail.png`})
@@ -249,8 +231,6 @@ function download(code, date, type = null) {
             });
         });
     })
-
-    
   }
 
 var domainh = {
@@ -261,7 +241,8 @@ var domainh = {
     stopDownload: stopDownload,
     getThumbnail: getThumbnail, 
     getDownloads: (code) => { return Promise.resolve(currentDownloads.filter(c => code == null || c.code == code)); },
-    getStatus: getStatus
+    getStatus: getStatus,
+    getStatuses: getStatuses
 }
 
 export default function (accessor) {
