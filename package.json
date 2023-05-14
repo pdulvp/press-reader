@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "run": "node index sampleh",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "run": "node index.mjs site/accessorh/sampleh.mjs",
+    "test": "node --version"
   },
   "author": "",
   "license": "ISC",

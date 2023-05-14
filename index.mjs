@@ -1,18 +1,21 @@
-const fs = require("fs");
+import fs from 'fs';
+import http from "http";
 
 if (process.argv[2] == undefined) {
   console.log("An accessor to a press service is required");
   process.exit();
 }
-if (!fs.existsSync("./accessorh/"+process.argv[2]+".js")) {
+if (!fs.existsSync("./"+process.argv[2])) {
   console.log("The specified accessor doesn't exist");
   process.exit();
 }
 
-const accessorh = require("./accessorh/"+process.argv[2]);
-const domainh = require("./domainh")(accessorh);
+const module = await import("./"+process.argv[2]);
+let accessorh = module.default;
+console.log(accessorh);
 
-http = require("http");
+import fDomainh from "./domainh.js";
+var domainh = fDomainh(accessorh);
 
 var ContentTypes = { 
 	cbz:   { contentType: 'application/zip', encoding: "binary" },
@@ -66,6 +69,9 @@ function proceedRequest(request, res) {
     
   } else if (request.url == '/css/main.css') {
     processor.end(res, fs.readFileSync("site/css/main.css"), ContentTypes.css);
+    
+  } else if (request.url == '/accessorh/sampleh.js') {
+    processor.end(res, fs.readFileSync("site/accessorh/sampleh.js"), ContentTypes.js);
     
   } else if (request.url == '/') {
     processor.end(res, fs.readFileSync("site/index.html"), ContentTypes.html);
@@ -151,5 +157,3 @@ server.on("request", (request, res) => {
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
-
-if (true) return

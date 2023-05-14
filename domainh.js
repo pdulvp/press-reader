@@ -1,11 +1,9 @@
 
-const cacheh = require("./cacheh");
 const fsh = require("./fsh");
 const promiseh = require("./promiseh");
 const fs = require("fs");
 const dateh = require("./dateh");
 const ziph = require("./ziph");
-const util = require('util');
 
 let currentDownloads = [];
 let accessorh = null;

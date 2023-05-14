@@ -1,9 +1,5 @@
 
-const dateh = require("../dateh");
-
-const fsh = require("../fsh");
-
-var sampleDomainh = {
+export default {
   getBooks: () => {
     let result = [
        { code: "CITIES", name: "Cities", group: "Road", latest: { date: "2023-01-02" }, }, 
@@ -104,4 +100,3 @@ var sampleDomainh = {
       });
   }
 }
-module.exports = sampleDomainh;
