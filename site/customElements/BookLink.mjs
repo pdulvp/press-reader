@@ -4,13 +4,9 @@ class BookLink extends HTMLElement {
     
   connectedCallback() {
     
-    let status = this.getAttribute('status');
     let code = this.getAttribute('code');
     let date = this.getAttribute('date');
 
-    let current = this.getAttribute('current');
-    let total = this.getAttribute('total');
-    
     let img = this.shadowRoot.querySelector("img");
     api.thumb(code, date).then(data => {
       img.src = data.thumbnail;
@@ -20,10 +16,6 @@ class BookLink extends HTMLElement {
     img.onclick = function(e) {
       document.getElementById("book-side-panel").setAttribute("code", code);
       document.getElementById("book-side-panel").setAttribute("date", date);
-
-      document.getElementById("book-side-panel").setAttribute("status", status);
-      document.getElementById("book-side-panel").setAttribute("current", current);
-      document.getElementById("book-side-panel").setAttribute("total", total);
 
       document.getElementById("book-side-panel").open = true;
       document.getElementById("background-panel").open = true;

@@ -248,8 +248,7 @@ var domainh = {
     stopDownload: stopDownload,
     getThumbnail: getThumbnail, 
     getDownloads: (code) => { return Promise.resolve(currentDownloads.filter(c => code == null || c.code == code)); },
-    getStatus: getStatus,
-    getStatuses: getStatuses
+    getStatus: getStatuses
 }
 
 export default function (accessor) {

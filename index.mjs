@@ -94,22 +94,13 @@ function proceedRequest(request, res) {
     });
 
   } else if (url.pathname == '/api/status') {
-    let code = url.searchParams.get("code");
-    let date = url.searchParams.get("date");
-    domainh.getStatus(code, date).then(e => {
-      processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
-    });
-
-  } else if (url.pathname == '/api/statuses') {
     let body = [];
     request.on('error', (err) => {
-      console.error(err);
     }).on('data', (chunk) => {
       body.push(chunk);
     }).on('end', () => {
       body = Buffer.concat(body).toString();
-      domainh.getStatuses(JSON.parse(body)).then(e => {
-        console.log(e);
+      domainh.getStatus(JSON.parse(body)).then(e => {
         processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
       })
     });

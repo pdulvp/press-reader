@@ -1,28 +1,24 @@
-//import { default as sampleDomainh } from "./accessorh/sampleh.mjs"
+import { default as sampleDomainh } from "./accessorh/sampleh.mjs"
 
 var api = {
     list: function() {
        return fetch("api/list").then(e => {
             return e.json();
         });
-        //return sampleDomainh.getBooks();
+        return sampleDomainh.getBooks();
     },
-    statuses: function(codes) {
-        return fetch(`api/statuses`, {
+    status: function(codes) {
+        return fetch(`api/status`, {
             method: "POST", body: JSON.stringify(codes) }).then(e => {
             return e.json();
         });
-    },
-    status: function(code, date) {
-        return fetch(`api/status?code=${code}&date=${date}`).then(e => {
-            return e.json();
-        });
+        return Promise.resolve([]);
     },
     archives: function(code) {
         return fetch(`api/archives?code=${code}`).then(e => {
             return e.json();
         });
-        //return sampleDomainh.getArchives(code);
+        return sampleDomainh.getArchives(code);
     },
     stop: function(code, date) {
         return fetch(`api/stop?code=${code}&date=${date}`).then(e => {
