@@ -1,4 +1,5 @@
 import { api } from "../api.mjs"
+import { dateh } from "../dateh.mjs"
 
 class BookPanel extends HTMLElement {
     
@@ -24,16 +25,17 @@ class BookPanel extends HTMLElement {
           }
         }
       })
+      
+      let readable = dateh.toReadable(date);
+      this.shadowRoot.querySelector(".date").textContent = readable;
     }
-
-    this.shadowRoot.querySelector(".date").textContent = date;
 
     if (this.status) {
       let links = [];
-      if (this.status.status != "empty") links.push(`<a href="/readCurrent?code=${code}&date=${date}">read</a>`);
+      if (this.status.status != "empty") links.push(`<a href="/read?code=${code}&date=${date}">read</a>`);
       if (this.status.status != "complete") links.push(`<a class="download">download</a> (<a class="download-full">full</a>)`);
       
-      if (this.status.current != "undefined" && this.status.total != "undefined" ) {
+      if (this.status.current != undefined && this.status.total != undefined ) {
         let percent = parseInt((parseInt(this.status.current) / parseInt(this.status.total)) * 100);
         links.push(`<spin-progress class="spin-warn" text="${this.status.current}" percent="${percent}"></spin-progress>`);
       }
@@ -41,24 +43,25 @@ class BookPanel extends HTMLElement {
         links.push(`<spin-progress class="spin-warn" text="✔" percent="100"></spin-progress>`);
       }
       this.shadowRoot.querySelector(".links").innerHTML = links.join(" - ");
+        
+      let download = this.shadowRoot.querySelector("a.download");
+      download.onclick = function(e) {
+        fetch(`/api/download?code=${code}&date=${date}`).then(e => {
+          console.log(e);
+        });
+        //href="/api/download?code=${code}&date=${date}"
+      }
+
+      let downloadFull = this.shadowRoot.querySelector("a.download-full");
+      downloadFull.onclick = function(e) {
+        fetch(`/api/download?code=${code}&date=${date}&type=full`).then(e => {
+          console.log(e);
+        });
+        //href="/api/download?code=${code}&date=${date}"
+      }
+
     }
     
-    let download = this.shadowRoot.querySelector("a.download");
-    download.onclick = function(e) {
-      fetch(`/api/download?code=${code}&date=${date}`).then(e => {
-        console.log(e);
-      });
-      //href="/api/download?code=${code}&date=${date}"
-    }
-
-    let downloadFull = this.shadowRoot.querySelector("a.download-full");
-    downloadFull.onclick = function(e) {
-      fetch(`/api/download?code=${code}&date=${date}&type=full`).then(e => {
-        console.log(e);
-      });
-      //href="/api/download?code=${code}&date=${date}"
-    }
-
   }
 
   onOpen = function() {
@@ -66,6 +69,7 @@ class BookPanel extends HTMLElement {
     let code = document.getElementById("book-side-panel").getAttribute("code");
     let date = document.getElementById("book-side-panel").getAttribute("date");
     api.status([{code: code, date: date}]).then(e => {
+      dwn.status = e[0].status;
       dwn.connectedCallback();
     })
   }

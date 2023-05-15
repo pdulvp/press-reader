@@ -1,5 +1,4 @@
 import { api } from "../api.mjs"
-import { dateh } from "../dateh.mjs"
 
 class BooksList extends HTMLElement {
   connectedCallback() {
@@ -13,7 +12,7 @@ class BooksList extends HTMLElement {
       let selectedGroup = this.getAttribute("group");
       if (selectedGroup != undefined) {
         let result = e.filter(a => selectedGroup == undefined || a.group == selectedGroup).map(a => {
-          return `<li><book-link code="${a.code}" date="${a.latest.date}" name="${a.name}" readableDate="${dateh.toReadable(a.latest.date)}"></book-link></li>`;
+          return `<li><book-link code="${a.code}" date="${a.latest.date}" name="${a.name}"></book-link></li>`;
         }).join("");
 
         let ul = `<ul class="books">`+result+`</ul>`;

@@ -1,4 +1,5 @@
 import { api } from "../api.mjs"
+import { dateh } from "../dateh.mjs"
 
 class BookLink extends HTMLElement {
     
@@ -23,7 +24,7 @@ class BookLink extends HTMLElement {
     
     this.shadowRoot.querySelectorAll("a")[0].href = `/read?code=${this.getAttribute('code')}&date=${this.getAttribute('date')}`;
     this.shadowRoot.querySelectorAll("a")[0].textContent = this.getAttribute('name');
-    this.shadowRoot.querySelectorAll("span")[1].textContent = this.getAttribute('readableDate');
+    this.shadowRoot.querySelectorAll("span")[1].textContent = dateh.toReadable(this.getAttribute('date'));
 
   }
 

@@ -1,4 +1,5 @@
 import { api } from "../api.mjs"
+import { dateh } from "../dateh.mjs"
 
 class ArchivesPanel extends HTMLElement {
     
@@ -6,10 +7,11 @@ class ArchivesPanel extends HTMLElement {
   connectedCallback() {
     let element = this.shadowRoot.querySelector("ul");
     let result = this.archives.map(d => {
+      let readable = dateh.toReadable(d.date);
       return `
       <li>
-        <img width="120px" code="${d.code}" date="${d.date}"></img>
-        <span>${d.date}</span>
+        <img width="120px" height="159px" code="${d.code}" date="${d.date}"></img>
+        <span>${readable}</span>
       </li>`;
     }).join("");
     if (this.archives.length == 0) {
