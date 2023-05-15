@@ -27,7 +27,7 @@ class DownloadsPanel extends HTMLElement {
   }
   onOpen = function() {
     let dwn = this;
-    api.downloads().then(d => {
+    api.fetch.downloads().then(d => {
       dwn.downloads = d.reverse().slice(0, 10);
       dwn.connectedCallback();
     });

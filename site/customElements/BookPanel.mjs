@@ -11,7 +11,7 @@ class BookPanel extends HTMLElement {
     let date = document.getElementById("book-side-panel").getAttribute("date");
     
     if (code != "null" && date != "null" && code != null && date != null) {
-      api.thumb(code, date).then(data => {
+      api.fetch.thumb(code, date).then(data => {
         img.src = data.thumbnail;
         img.style = "border: 1px solid gray; " + (data.status == "cover" ? "filter:saturate(-0)": "");
         img.onclick = function(e) {
@@ -68,7 +68,7 @@ class BookPanel extends HTMLElement {
     let dwn = this;
     let code = document.getElementById("book-side-panel").getAttribute("code");
     let date = document.getElementById("book-side-panel").getAttribute("date");
-    api.status([{code: code, date: date}]).then(e => {
+    api.fetch.status([{code: code, date: date}]).then(e => {
       dwn.status = e[0].status;
       dwn.connectedCallback();
     })

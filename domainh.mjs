@@ -18,15 +18,6 @@ function findDownload(code, date, create = true) {
     return result;
 }
 
-function getBooks() {
-    return accessorh.getBooks();
-}
-
-function getArchives(code) {
-    //window.parent.location.href='/Login?ErrorCode=1';
-    return accessorh.getArchives(code);
-}
-
 function getPages(code, date) {
     console.log("getPages"+code+" "+date);
     date = dateh.formatDate(date, "-");
@@ -39,8 +30,8 @@ function searchDownloadedPages(folder) {
     });
 }
 
-function getStatuses(codes) {
-    return Promise.all(codes.map(r => getStatus(r.code, r.date))).then(res => {
+function getStatus(codes) {
+    return Promise.all(codes.map(r => unaryStatus(r.code, r.date))).then(res => {
         codes.forEach((v, i) => {
             codes[i].status = res[i];
         });
@@ -48,7 +39,7 @@ function getStatuses(codes) {
     });
 }
 
-function getStatus(code, date) {
+function unaryStatus(code, date) {
     return new Promise((resolve, reject) => {
         date = dateh.formatDate(date, "-");
         let folder = `results/${code}/${date}`;
@@ -81,7 +72,7 @@ function getStatus(code, date) {
     });
 }
 
-function getComplet(code, date) {
+function read(code, date) {
     date = dateh.formatDate(date, "-");
     let folder = `results/${code}/${date}`;
     let outputFile = `${folder}/${code}_${date}.cbz`;
@@ -241,14 +232,12 @@ function download(code, date, type = null) {
   }
 
 var domainh = {
-    getBooks: getBooks,
-    getArchives: getArchives,
-    getComplet: getComplet,
+    read: read,
     download: download,
     stopDownload: stopDownload,
-    getThumbnail: getThumbnail, 
+    getThumbnail: getThumbnail,
     getDownloads: (code) => { return Promise.resolve(currentDownloads.filter(c => code == null || c.code == code)); },
-    getStatus: getStatuses
+    getStatus: getStatus
 }
 
 export default function (accessor) {

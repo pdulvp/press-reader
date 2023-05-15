@@ -9,7 +9,7 @@ class BookLink extends HTMLElement {
     let date = this.getAttribute('date');
 
     let img = this.shadowRoot.querySelector("img");
-    api.thumb(code, date).then(data => {
+    api.fetch.thumb(code, date).then(data => {
       img.src = data.thumbnail;
       img.style = "border: 1px solid gray; " + (data.status == "cover" ? "filter:saturate(-0)": "");
     });

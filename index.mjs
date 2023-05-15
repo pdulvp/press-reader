@@ -1,5 +1,7 @@
 import fs from 'fs';
 import http from "http";
+import fDomainh from "./domainh.mjs";
+import requesth from "./requesth.js"
 
 if (process.argv[2] == undefined) {
   console.log("An accessor to a press service is required");
@@ -10,15 +12,24 @@ if (!fs.existsSync("./"+process.argv[2])) {
   process.exit();
 }
 
-const module = await import("./"+process.argv[2]);
-let accessorh = module.default;
-console.log("accessorh");
-console.log(accessorh);
-
-import fDomainh from "./domainh.mjs";
+const module = await import("./" + process.argv[2]);
+var accessorh = module.default;
 var domainh = fDomainh(accessorh);
-console.log("domainh");
-console.log(domainh);
+
+var api = {
+  list: accessorh.getBooks,
+  archives: accessorh.getArchives,
+  fetch: {
+    status: domainh.getStatus,
+    read: domainh.read,
+    download: domainh.download,
+    downloads: domainh.getDownloads,
+    stop: domainh.stopDownload,
+    thumb: domainh.getThumbnail,
+  },
+}
+
+console.log(api);
 
 var ContentTypes = { 
 	cbz:   { contentType: 'application/zip', encoding: "binary" },
@@ -54,27 +65,23 @@ function proceedRequest(request, res) {
   let url = new URL("https://" + hostname + request.url);
   console.log(url.pathname + " "+url.searchParams);
 
-  let customElements = ["customElements/BooksList", "customElements/BookLink", "customElements/BookPanel", "customElements/ArchivesPanel", "customElements/SpinProgress", 
+  let customElements = [ "customElements/BooksList", "customElements/BookLink", "customElements/BookPanel", "customElements/ArchivesPanel", "customElements/SpinProgress", 
   "customElements/SpinProgress.domain", "customElements/NavHeader", "customElements/BackgroundPanel", "customElements/DownloadsPanel", "customElements/SidePanel"];
+  
+  let modules = ["api", "index", "dateh", "accessorh/sampleh"];
+
+  let css = ["css/main"];
+  
   let file = request.url.substring(1, request.url.length - 4);
   
-  if (request.url == '/api.mjs') {
-    processor.end(res, fs.readFileSync("site/api.mjs"), ContentTypes.js);
-
-  } else if (request.url == '/index.mjs') {
-    processor.end(res, fs.readFileSync("site/index.mjs"), ContentTypes.js);
-
+  if (modules.includes(file)) {
+    processor.end(res, fs.readFileSync("site/"+file+".mjs"), ContentTypes.mjs);
+    
   } else if (customElements.includes(file)) {
     processor.end(res, fs.readFileSync("site/"+file+".mjs"), ContentTypes.mjs);
     
-  } else if (request.url == '/dateh.mjs') {
-    processor.end(res, fs.readFileSync("site/dateh.mjs"), ContentTypes.js);
-    
-  } else if (request.url == '/css/main.css') {
-    processor.end(res, fs.readFileSync("site/css/main.css"), ContentTypes.css);
-    
-  } else if (request.url == '/accessorh/sampleh.mjs') {
-    processor.end(res, fs.readFileSync("site/accessorh/sampleh.mjs"), ContentTypes.js);
+  } else if (css.includes(file)) {
+    processor.end(res, fs.readFileSync("site/"+file+".css"), ContentTypes.css);
     
   } else if (request.url == '/') {
     processor.end(res, fs.readFileSync("site/index.html"), ContentTypes.html);
@@ -83,24 +90,19 @@ function proceedRequest(request, res) {
     processor.end(res, fs.readFileSync("site/index.html"), ContentTypes.html);
 
   } else if (url.pathname == '/api/list') {
-    domainh.getBooks().then(e => {
+    api.list().then(e => {
       processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
     });
 
   } else if (url.pathname == '/api/archives') {
     let code = url.searchParams.get("code");
-    domainh.getArchives(code).then(e => {
+    api.archives(code).then(e => {
       processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
     });
 
   } else if (url.pathname == '/api/status') {
-    let body = [];
-    request.on('error', (err) => {
-    }).on('data', (chunk) => {
-      body.push(chunk);
-    }).on('end', () => {
-      body = Buffer.concat(body).toString();
-      domainh.getStatus(JSON.parse(body)).then(e => {
+    requesth.json(request).then(json => {
+      api.fetch.status(json).then(e => {
         processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
       })
     });
@@ -108,16 +110,16 @@ function proceedRequest(request, res) {
   } else if (url.pathname == '/thumb') {
     let code = url.searchParams.get("code");
     let date = url.searchParams.get("date");
-    domainh.getThumbnail(code, date).then(r => {
+    api.fetch.thumb(code, date).then(r => {
       processor.writeHead("Content-Disposition", "attachment;filename=" + code + date + ".png");
       processor.writeHead("X-Thumbnail-Status", r.status);
       processor.end(res, r.thumbnail, ContentTypes.png);
     });
     
-  } else if (url.pathname == '/readCurrent') {
+  } else if (url.pathname == '/read') {
     let code = url.searchParams.get("code");
     let date = url.searchParams.get("date");
-    domainh.getComplet(code, date).then(r => {
+    api.fetch.read(code, date).then(r => {
       if (r.status == undefined) {
         processor.writeHead("Content-Disposition", "attachment;filename=" + code + date + ".cbz");
         processor.end(res, r, ContentTypes.cbz);
@@ -130,19 +132,19 @@ function proceedRequest(request, res) {
     let code = url.searchParams.get("code");
     let date = url.searchParams.get("date");
     let type = url.searchParams.get("type");
-    domainh.download(code, date, type).then(r => {
+    api.fetch.download(code, date, type).then(r => {
       processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
     });
 
   } else if (url.pathname == '/api/downloads') {
-    domainh.getDownloads(null).then(r => {
+    api.fetch.downloads(null).then(r => {
       processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
     });
 
   } else if (url.pathname == '/api/stop') {
     let code = url.searchParams.get("code");
     let date = url.searchParams.get("date");
-    domainh.stopDownload(code, date).then(r => {
+    api.fetch.stop(code, date).then(r => {
       processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
     });
 

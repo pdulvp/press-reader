@@ -22,7 +22,7 @@ class ArchivesPanel extends HTMLElement {
     imgs.forEach(img => {
       let code = img.getAttribute("code");
       let date = img.getAttribute("date");
-      api.thumb(code, date).then(data => {
+      api.fetch.thumb(code, date).then(data => {
         img.src = data.thumbnail;
         img.style = "border: 1px solid gray; " + (data.status == "cover" ? "filter:saturate(-0)": "");
       });
@@ -48,7 +48,7 @@ class ArchivesPanel extends HTMLElement {
     let code = document.getElementById("book-side-panel").getAttribute("code");
     let date = document.getElementById("book-side-panel").getAttribute("date");
     api.archives(code, date).then(d => {
-      api.status(d).then(e => {
+      api.fetch.status(d).then(e => {
         dwn.archives = e.slice(0, 10);
         dwn.connectedCallback();
       })
