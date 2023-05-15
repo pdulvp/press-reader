@@ -203,9 +203,9 @@ function download(code, date, type = null) {
             });
         } else {
             accessorh.getThumbnail(code, date).then(imageData => {
-              fs.writeFileSync(thumb, imageData);
+              fs.writeFileSync(thumb, imageData, "binary");
               thumb = `results/${code}/thumbnail.png`;
-              fs.writeFileSync(thumb, imageData);
+              fs.writeFileSync(thumb, imageData, "binary");
               resolve({status: "date", thumbnail: imageData});
             }).catch(e => {
                 reject();
