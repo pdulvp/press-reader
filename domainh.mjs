@@ -1,10 +1,9 @@
 
-import fsh from "./fsh.js";
-import promiseh from "./promiseh.js";
+import fsh from "./utils/fsh.js";
+import promiseh from "./utils/promiseh.js";
 import fs from "fs";
 import { dateh } from "./site/dateh.mjs";
-import ziph from "./ziph.js";
-
+import ziph from "./utils/ziph.js";
 let currentDownloads = [];
 let accessorh = null;
 
@@ -19,7 +18,6 @@ function findDownload(code, date, create = true) {
 }
 
 function getPages(code, date) {
-    console.log("getPages"+code+" "+date);
     date = dateh.formatDate(date, "-");
     return accessorh.getPages(code, date);
 }

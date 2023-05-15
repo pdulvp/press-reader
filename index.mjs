@@ -1,7 +1,7 @@
 import fs from 'fs';
 import http from "http";
 import fDomainh from "./domainh.mjs";
-import requesth from "./requesth.js"
+import requesth from "./utils/requesth.js"
 
 if (process.argv[2] == undefined) {
   console.log("An accessor to a press service is required");
