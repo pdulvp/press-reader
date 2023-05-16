@@ -130,45 +130,52 @@ function download(code, date, type = null) {
         console.log(currentDownloads);
         if (!download.inProgress) {
             download.inProgress = true;
-            getPages(code, date).then(e => {
-                download.total = e.length;
 
-                let ea = e.filter(r => {
-                    let imageFile = `${folder}/${r}.png`;
-                    return !fsh.fileExists(imageFile);
-                });
-                download.current = download.total - ea.length;
-                if (type == "cover") {
-                    ea = ea.slice(0, 1);
-                } else if (type != "full") {
-                    ea = ea.slice(0, 3);
-                }
-                promiseh.consecutive(ea, (imageId) => {
-                    if (download.inProgress == false) {
-                        return Promise.resolve(false);
+            promiseh.queue.append( () => {
+                return getPages(code, date).then(e => {
+                    download.total = e.length;
+    
+                    let ea = e.filter(r => {
+                        let imageFile = `${folder}/${r}.png`;
+                        return !fsh.fileExists(imageFile);
+                    });
+                    download.current = download.total - ea.length;
+                    if (type == "cover") {
+                        ea = ea.slice(0, 1);
+                    } else if (type != "full") {
+                        ea = ea.slice(0, 3);
                     }
-                    let imageFile = `${folder}/${imageId}.png`;
-                    download.current++;
 
-                    return accessorh.getImage(imageId).then(tt => {
-                        return fsh.write(imageFile, tt).then(e => {
-                            console.log('The file has been saved!');
-                            return Promise.resolve(true);
+
+                    promiseh.queue.append(ea.map(e => () => {
+                        console.log(`  proceed image ${e}`);
+                        let imageId = e;
+                        if (download.inProgress == false) {
+                            return Promise.resolve(false);
+                        }
+                        let imageFile = `${folder}/${imageId}.png`;
+                        download.current++;
+    
+                        return accessorh.getImage(imageId).then(tt => {
+                            return fsh.write(imageFile, tt).then(e => {
+                                console.log('The file has been saved!');
+                                return Promise.resolve(true);
+                            });
+                        }).then(ee => {
+                            if (download.total == download.current) {
+                                searchDownloadedPages(folder).then(files => {
+                                    ziph.createZip(files, outputFile);
+                                    download.inProgress = false;
+                                });
+                            } else {
+                                download.inProgress = false;
+                            }
                         });
-                    }).then(promiseh.wait);
-                
-                }).then(ee => {
-                    if (download.total == download.current) {
-                        searchDownloadedPages(folder).then(files => {
-                            ziph.createZip(files, outputFile);
-                            download.inProgress = false;
-                        });
-                    } else {
-                        download.inProgress = false;
-                    }
+                    }));
                 });
-                resolve({status : "inProgress"});
             });
+            resolve({status : "inProgress"});
+
         } else {
             resolve({status : "inProgress"});
         }
