@@ -10,7 +10,7 @@ class ArchivesPanel extends HTMLElement {
       let readable = dateh.toReadable(d.date);
       return `
       <li>
-        <img width="120px" height="159px" code="${d.code}" date="${d.date}"></img>
+        <img-status width="120px" height="159px" code="${d.code}" date="${d.date}"></img-status>
         <span>${readable}</span>
       </li>`;
     }).join("");
@@ -18,13 +18,13 @@ class ArchivesPanel extends HTMLElement {
       result = "No archives found";
     }
     element.innerHTML = result;
-    let imgs = this.shadowRoot.querySelectorAll("img");
+    let imgs = this.shadowRoot.querySelectorAll("img-status");
     imgs.forEach(img => {
       let code = img.getAttribute("code");
       let date = img.getAttribute("date");
       api.fetch.thumb(code, date).then(data => {
         img.src = data.thumbnail;
-        img.style = "border: 1px solid gray; " + (data.status == "cover" ? "filter:saturate(-0)": "");
+        img.disabled = data.status == "cover";
       });
 
       img.onclick = function(event) {
@@ -44,13 +44,12 @@ class ArchivesPanel extends HTMLElement {
   onOpen = function() {
     let element = this.shadowRoot.querySelector("ul");
     element.innerHTML = "Loading archives. Please wait";
-    let dwn = this;
     let code = document.getElementById("book-side-panel").getAttribute("code");
     let date = document.getElementById("book-side-panel").getAttribute("date");
     api.archives(code, date).then(d => {
       api.fetch.status(d).then(e => {
-        dwn.archives = e.slice(0, 10);
-        dwn.connectedCallback();
+        this.archives = e.slice(0, 10);
+        this.connectedCallback();
       })
     });
   }

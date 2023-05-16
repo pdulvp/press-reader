@@ -10,7 +10,7 @@ class DownloadsPanel extends HTMLElement {
       return `
       <li>
         <spin-progress class="spin-warn" text="${d.current}" percent="${percent}"></spin-progress>
-        <span class="${d.inProgress?"":"stopped"}">${d.code} ${d.inProgress ? "(in progress)" : ""}</span>
+        <div code="${d.code}" date="${d.date}" class="${d.inProgress?"":"stopped"}">${d.code} ${d.inProgress ? "(in progress)" : ""}</div>
         ${d.inProgress ? `<a href="/api/stop?code=${d.code}&date=${d.date}">stop</a>` : ``}
       </li>`;
     }).join("");
@@ -19,17 +19,36 @@ class DownloadsPanel extends HTMLElement {
     }
     element.innerHTML = result;
     let stop = this.shadowRoot.querySelector("a");
-    stop.onclick = stop();
+    if (stop) {
+      stop.onclick = this.stopEvent;
+    }
+
+    let span = this.shadowRoot.querySelector("div");
+    if (span) {
+      span.onclick = this.spanEvent;
+    }
   }
 
-  stop = function(event) {
+  stopEvent = function(event) {
     
   }
+  spanEvent = function(event) {
+    let code = event.target.getAttribute("code");
+    let date = event.target.getAttribute("date");
+    
+    document.getElementById("nav-side-panel").open = false;
+
+    document.getElementById("book-side-panel").setAttribute("code", code);
+    document.getElementById("book-side-panel").setAttribute("date", date);
+
+    document.getElementById("book-side-panel").open = true;
+    document.getElementById("background-panel").open = true;
+  }
+
   onOpen = function() {
-    let dwn = this;
     api.fetch.downloads().then(d => {
-      dwn.downloads = d.reverse().slice(0, 10);
-      dwn.connectedCallback();
+      this.downloads = d.reverse().slice(0, 10);
+      this.connectedCallback();
     });
   }
 
@@ -42,11 +61,11 @@ class DownloadsPanel extends HTMLElement {
           text-transform: uppercase;
           font-weight: bold;
         }
-        span.stopped {
+        div.stopped {
           text-decoration: line-through;
           color: gray;
         }
-        div {
+        div.root {
           margin: 20px;
           color: rgb(100,50,50);
           font-family: Segoe UI;
@@ -76,7 +95,7 @@ class DownloadsPanel extends HTMLElement {
           flex-grow: 0;
         }
       </style>
-      <div>
+      <div class="root">
       <span class="title">Downloads</span>
       <ul class="ul">
       </ul>

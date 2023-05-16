@@ -85,6 +85,7 @@ var accessorh = {
         "sec-ch-ua-mobile": "?0",
         "sec-ch-ua-platform": "\"Windows\"",
         "sec-fetch-dest": "empty",
+        "Access-Control-Allow-Origin": "*",
         "sec-fetch-mode": "cors",
         "sec-fetch-site": "same-origin",
         "x-requested-with": "XMLHttpRequest"

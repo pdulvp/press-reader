@@ -8,10 +8,10 @@ class BookLink extends HTMLElement {
     let code = this.getAttribute('code');
     let date = this.getAttribute('date');
 
-    let img = this.shadowRoot.querySelector("img");
+    let img = this.shadowRoot.querySelector("img-status");
     api.fetch.thumb(code, date).then(data => {
       img.src = data.thumbnail;
-      img.style = "border: 1px solid gray; " + (data.status == "cover" ? "filter:saturate(-0)": "");
+      img.disabled = data.status == "cover";
     });
 
     img.onclick = function(e) {
@@ -36,7 +36,7 @@ class BookLink extends HTMLElement {
       const wrapper = document.createElement('div');
       wrapper.setAttribute('style', 'width: 150px');
       
-      wrapper.innerHTML = `<img width="150px" height="200px" />
+      wrapper.innerHTML = `<img-status width="150px" height="200px"></img-status>
       <span style="padding: 4px; display:block; font-family: Segoe UI">
           <a style="font-size: 14px; color: #222; text-decoration: none"></a>
           <br/>

@@ -6,14 +6,14 @@ class BookPanel extends HTMLElement {
   status = undefined;
 
   connectedCallback() {
-    let img = this.shadowRoot.querySelector("img");
+    let img = this.shadowRoot.querySelector("img-status");
     let code = document.getElementById("book-side-panel").getAttribute("code");
     let date = document.getElementById("book-side-panel").getAttribute("date");
     
     if (code != "null" && date != "null" && code != null && date != null) {
       api.fetch.thumb(code, date).then(data => {
         img.src = data.thumbnail;
-        img.style = "border: 1px solid gray; " + (data.status == "cover" ? "filter:saturate(-0)": "");
+        img.disabled = data.status == "cover";
         img.onclick = function(e) {
           if (data.status != "date") {
             fetch(`/api/download?code=${code}&date=${date}&type=cover`).then(e => {
@@ -65,12 +65,11 @@ class BookPanel extends HTMLElement {
   }
 
   onOpen = function() {
-    let dwn = this;
     let code = document.getElementById("book-side-panel").getAttribute("code");
     let date = document.getElementById("book-side-panel").getAttribute("date");
     api.fetch.status([{code: code, date: date}]).then(e => {
-      dwn.status = e[0].status;
-      dwn.connectedCallback();
+      this.status = e[0].status;
+      this.connectedCallback();
     })
   }
 
@@ -103,7 +102,7 @@ class BookPanel extends HTMLElement {
         }
       </style>
       <div class="main">
-        <img width="220px"></img>
+        <img-status width="220px"></img-status>
         <span class="date"></span>
         <div class="links"></div>
       </div>

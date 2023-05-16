@@ -65,7 +65,7 @@ function proceedRequest(request, res) {
   let url = new URL("https://" + hostname + request.url);
   console.log(url.pathname + " "+url.searchParams);
 
-  let customElements = [ "customElements/BooksList", "customElements/BookLink", "customElements/BookPanel", "customElements/ArchivesPanel", "customElements/SpinProgress", 
+  let customElements = [ "customElements/BooksList", "customElements/StatusImage", "customElements/BookLink", "customElements/BookPanel", "customElements/ArchivesPanel", "customElements/SpinProgress", 
   "customElements/SpinProgress.domain", "customElements/NavHeader", "customElements/BackgroundPanel", "customElements/DownloadsPanel", "customElements/SidePanel"];
   
   let modules = ["api", "index", "dateh", "accessorh/sampleh"];
