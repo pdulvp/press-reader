@@ -2,7 +2,7 @@ import { api } from "../api.mjs"
 import { dateh } from "../dateh.mjs"
 
 class ArchivesPanel extends HTMLElement {
-    
+  
   archives = [];
   connectedCallback() {
     let element = this.shadowRoot.querySelector("ul");
@@ -18,6 +18,22 @@ class ArchivesPanel extends HTMLElement {
       result = "No archives found";
     }
     element.innerHTML = result;
+
+    let title = this.shadowRoot.querySelector(".title");
+    let dwn = this;
+    title.onclick = function(event) {
+      let element = dwn.shadowRoot.querySelector("ul");
+      element.innerHTML = "Loading archives. Please wait";
+      let code = document.getElementById("book-side-panel").getAttribute("code");
+      let date = document.getElementById("book-side-panel").getAttribute("date");
+      api.archives(code, date).then(d => {
+        api.fetch.status(d).then(e => {
+          dwn.archives = e.slice(0, 10);
+          dwn.connectedCallback();
+        })
+      });
+    }
+    
     let imgs = this.shadowRoot.querySelectorAll("img-status");
     imgs.forEach(img => {
       let code = img.getAttribute("code");
@@ -43,15 +59,7 @@ class ArchivesPanel extends HTMLElement {
   }
   onOpen = function() {
     let element = this.shadowRoot.querySelector("ul");
-    element.innerHTML = "Loading archives. Please wait";
-    let code = document.getElementById("book-side-panel").getAttribute("code");
-    let date = document.getElementById("book-side-panel").getAttribute("date");
-    api.archives(code, date).then(d => {
-      api.fetch.status(d).then(e => {
-        this.archives = e.slice(0, 10);
-        this.connectedCallback();
-      })
-    });
+    element.innerHTML = "Click title to load archives";
   }
 
   constructor(){
@@ -59,11 +67,11 @@ class ArchivesPanel extends HTMLElement {
       const shadow = this.attachShadow({mode: 'open'});
       shadow.innerHTML = `
       <style>
-        span.title {
+        div.title {
           text-transform: uppercase;
           font-weight: bold;
         }
-        div {
+        div.root {
           background-color: #dfd1001f;
           padding: 20px;
           color: rgb(100,50,50);
@@ -98,8 +106,8 @@ class ArchivesPanel extends HTMLElement {
           flex-grow: 0;
         }
       </style>
-      <div>
-      <span class="title">Archives</span>
+      <div class="root">
+      <div class="title">Archives</div>
       <ul class="ul">
       </ul>
       </div>
