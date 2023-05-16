@@ -7,6 +7,9 @@
  SPDX-License-Identifier: CC-BY-NC-ND-4.0
  @author: pdulvp@laposte.net
 */
+
+var consoleh = require("./consoleh");
+
 var promiseh = {
   
     //From an array of values and a function returning a promise from a value
@@ -21,9 +24,9 @@ var promiseh = {
         }, Promise.resolve());
     },
 
-    swait(data) {
+    wait(data, duration = undefined) { //let waitTimer = Math.round(Math.random()*18000)+15000;
         return new Promise((resolve, reject) => {
-            let waitTimer = Math.round(Math.random()*1800)+1500;
+            let waitTimer = duration ? duration : Math.round(Math.random()*18000)+15000;
             console.log(waitTimer);
             setTimeout(function () {
                 resolve(data);
@@ -31,31 +34,27 @@ var promiseh = {
         });
     },
 
-    wait(data) {
-        return new Promise((resolve, reject) => {
-            let waitTimer = Math.round(Math.random()*18000)+15000;
-            console.log(waitTimer);
-            setTimeout(function () {
-                resolve(data);
-            }, waitTimer);
-        });
-    },
-
-    queue: {
+    newQueue: (duration = () => 0) => { return {
         pendingPromises: [],
         isExecuted: false,
-        append: function(fPromise) {
-            console.log("append");
-            if (Array.isArray(fPromise)) {
-                fPromise.forEach(p => this.pendingPromises.push(p));
-            } else  {
-    	        this.pendingPromises.push(fPromise);
+        
+        push: function(fPromise, first = false) {
+            let toAdd = Array.isArray(fPromise) ? fPromise : [fPromise];
+            if (first) {
+                console.log("push first");
+                this.pendingPromises.unshift(...toAdd);
+            } else {
+                console.log("push");
+                this.pendingPromises.push(...toAdd);
             }
+            
             if (!this.isExecuted) {
                 this.proceedPending();
             }
         },
         proceedPending: function() {
+            consoleh.green("queue: "+this.pendingPromises.length);
+            
             return new Promise((resolve, reject) => {
                 console.log("proceedPending");
                 let current = this.pendingPromises.shift();
@@ -63,7 +62,7 @@ var promiseh = {
                     this.isExecuted = true;
                     current().then(e => {
                         if (this.pendingPromises.length > 0) {
-                            return promiseh.wait().then(e => {
+                            return promiseh.wait(null, duration()).then(e => {
                                 return this.proceedPending();
                             });
                         } else {
@@ -77,7 +76,7 @@ var promiseh = {
                 }
             });
         }
-    }
+    } }
   };
 
   module.exports = promiseh;

@@ -115,6 +115,9 @@ function stopDownload(code, date) {
     return Promise.resolve(true);
 }
 
+let pagesQueue = promiseh.newQueue(() => Math.round(Math.random()*1000)+500);
+let imagesQueue = promiseh.newQueue(() => Math.round(Math.random()*18000)+15000);
+
 function download(code, date, type = null) {
     date = dateh.formatDate(date, "-");
     let folder = `results/${code}/${date}`;
@@ -131,7 +134,7 @@ function download(code, date, type = null) {
         if (!download.inProgress) {
             download.inProgress = true;
 
-            promiseh.queue.append( () => {
+            pagesQueue.push( () => {
                 return getPages(code, date).then(e => {
                     download.total = e.length;
     
@@ -146,8 +149,7 @@ function download(code, date, type = null) {
                         ea = ea.slice(0, 3);
                     }
 
-
-                    promiseh.queue.append(ea.map(e => () => {
+                    imagesQueue.push(ea.map((e,i) => () => {
                         console.log(`  proceed image ${e}`);
                         let imageId = e;
                         if (download.inProgress == false) {
@@ -162,16 +164,16 @@ function download(code, date, type = null) {
                                 return Promise.resolve(true);
                             });
                         }).then(ee => {
-                            if (download.total == download.current) {
+                            if (download.total == download.current ) {
                                 searchDownloadedPages(folder).then(files => {
                                     ziph.createZip(files, outputFile);
                                     download.inProgress = false;
                                 });
-                            } else {
+                            } else if (i == ea.length - 1) {
                                 download.inProgress = false;
                             }
                         });
-                    }));
+                    }), type == "cover");
                 });
             });
             resolve({status : "inProgress"});
