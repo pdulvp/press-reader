@@ -3,6 +3,40 @@ import { dateh } from "../dateh.mjs"
 
 class BookLink extends HTMLElement {
     
+  constructor(){
+    super();
+      const shadow = this.attachShadow({mode: 'open'});
+      
+      shadow.innerHTML = `
+      <style>
+        .root {
+          width: 150px
+        }
+        .abstract {
+          font-size: 12px; color: gray
+        }
+        .title {
+          font-size: 14px; color: #222; text-decoration: none
+        }
+        .img {
+          display: block;
+          border: 1px solid gray;
+        }
+        .description-section {
+          padding: 4px; display:flex; font-family: Segoe UI;
+          flex-direction: column;
+        }
+      </style>
+      <div class="root">
+        <img-status class="img" width="148px" height="200px"></img-status>
+        <div class="description-section">
+            <a class="title"></a>
+            <span class="abstract"></span>
+        </div>
+      </div>
+      `;
+    }
+  
   connectedCallback() {
     
     let code = this.getAttribute('code');
@@ -22,37 +56,12 @@ class BookLink extends HTMLElement {
       document.getElementById("background-panel").open = true;
     }
     
-    this.shadowRoot.querySelectorAll("a")[0].href = `/read?code=${this.getAttribute('code')}&date=${this.getAttribute('date')}`;
-    this.shadowRoot.querySelectorAll("a")[0].textContent = this.getAttribute('name');
-    this.shadowRoot.querySelectorAll("span")[1].textContent = dateh.toReadable(this.getAttribute('date'));
+    this.shadowRoot.querySelector("a").href = `/read?code=${this.getAttribute('code')}&date=${this.getAttribute('date')}`;
+    this.shadowRoot.querySelector("a").textContent = this.getAttribute('name');
+    this.shadowRoot.querySelector("span").textContent = dateh.toReadable(this.getAttribute('date'));
 
   }
+}
 
-  constructor(){
-    super();
-      
-      const shadow = this.attachShadow({mode: 'open'});
-      
-      const wrapper = document.createElement('div');
-      wrapper.setAttribute('style', 'width: 150px');
-      
-      wrapper.innerHTML = `<img-status width="150px" height="200px"></img-status>
-      <span style="padding: 4px; display:block; font-family: Segoe UI">
-          <a style="font-size: 14px; color: #222; text-decoration: none"></a>
-          <br/>
-          <span style="font-size: 12px; color: gray"></span>
-          <br/>
-          <span style="font-size: 12px; color: gray"></span>
-      </span>
-      `;
-
-      const style = document.createElement('style');
-      style.textContent = ``;
-      
-      shadow.appendChild(style);
-      shadow.appendChild(wrapper);
-    }
-  }
-  
-  // Define the new element
-  customElements.define('book-link', BookLink);
+// Define the new element
+customElements.define('book-link', BookLink);

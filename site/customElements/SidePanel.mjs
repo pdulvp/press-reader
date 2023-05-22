@@ -12,50 +12,34 @@
  --spin-stroke-width    default 4
  */
 
-function hasClass(item, value) {
-	return item.getAttribute("class") != null && (item.getAttribute("class").includes(value));
-}
-
-function removeClass(item, value) {
-	if (hasClass(item, value)) {
-		item.setAttribute("class", item.getAttribute("class").replace(value, "").trim());
-	}
-} 
-
-function addClass(item, value) {
-	if (item == undefined || item == null) {
-		console.warn("Unknown item");
-	} else {
-		if (!hasClass(item, value)) {
-			let current = item.getAttribute("class");
-			current = current == null ? "" : current;
-			item.setAttribute("class", (current+ " "+value+" ").trim());
-		}
-	}
-}
-
+import { domh } from "../domh.mjs"
 
 class SidePanel extends HTMLElement {
   get open() {
     let element = this.shadowRoot.querySelector("nav");
-    return hasClass(element, 'slide-in')
+    return domh.hasClass(element, 'slide-in')
   }
   
   set open(val) {
     if(val) {
       let element = this.shadowRoot.querySelector("nav");
-      addClass(element, 'slide-in');
-      removeClass(element, 'slide-out');
+      domh.addClass(element, 'slide-in');
+      domh.removeClass(element, 'slide-out');
       this.shadowRoot.querySelector("slot").assignedElements().forEach(e => {
         if (e.onOpen) e.onOpen(null)
       });
+      let item = document.getElementById(this.getAttribute("back"));
+      item.open = true;
+
     } else {
       let element = this.shadowRoot.querySelector("nav");
-      removeClass(element, 'slide-in');
-      addClass(element, 'slide-out');
+      domh.removeClass(element, 'slide-in');
+      domh.addClass(element, 'slide-out');
       this.shadowRoot.querySelector("slot").assignedElements().forEach(e => {
         if (e.onClose) e.onClose(null);
       });
+      let item = document.getElementById(this.getAttribute("back"));
+      item.open = false;
     }
   }
 
@@ -66,8 +50,8 @@ class SidePanel extends HTMLElement {
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue != null) this.connectedCallback();
     if (name == "class") {
-      removeClass(this.shadowRoot.querySelector("nav"), oldValue);
-      addClass(this.shadowRoot.querySelector("nav"), newValue);
+      domh.removeClass(this.shadowRoot.querySelector("nav"), oldValue);
+      domh.addClass(this.shadowRoot.querySelector("nav"), newValue);
     }
    }
 

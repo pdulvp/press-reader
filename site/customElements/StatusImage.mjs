@@ -1,38 +1,18 @@
-function hasClass(item, value) {
-	return item.getAttribute("class") != null && (item.getAttribute("class").includes(value));
-}
-
-function removeClass(item, value) {
-	if (hasClass(item, value)) {
-		item.setAttribute("class", item.getAttribute("class").replace(value, "").trim());
-	}
-} 
-
-function addClass(item, value) {
-	if (item == undefined || item == null) {
-		console.warn("Unknown item");
-	} else {
-		if (!hasClass(item, value)) {
-			let current = item.getAttribute("class");
-			current = current == null ? "" : current;
-			item.setAttribute("class", (current+ " "+value+" ").trim());
-		}
-	}
-}
+import { domh } from "../domh.mjs"
 
 class StatusImage extends HTMLElement {
     get disabled() {
       let element = this.shadowRoot.querySelector("img");
-      return hasClass(element, 'disabled')
+      return domh.hasClass(element, 'disabled')
     }
     
     set disabled(val) {
       if(val) {
         let element = this.shadowRoot.querySelector("img");
-        addClass(element, 'disabled');
+        domh.addClass(element, 'disabled');
       } else {
         let element = this.shadowRoot.querySelector("img");
-        removeClass(element, 'disabled');
+        domh.removeClass(element, 'disabled');
       }
     }
   
@@ -52,15 +32,12 @@ class StatusImage extends HTMLElement {
   
     attributeChangedCallback(name, oldValue, newValue) {
       if (oldValue != null) this.connectedCallback();
-      if (name == "class") {
-        removeClass(this.shadowRoot.querySelector("img"), oldValue);
-        addClass(this.shadowRoot.querySelector("img"), newValue);
-      } else {
+      if (name == "width" || name == "height") {
         this.shadowRoot.querySelector("img").setAttribute(name, newValue);
       }
      }
   
-    static get observedAttributes() { return ['class', 'style', 'width', 'height']; }
+    static get observedAttributes() { return ['width', 'height']; }
   
     constructor(){
       super();

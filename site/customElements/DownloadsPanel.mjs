@@ -40,9 +40,7 @@ class DownloadsPanel extends HTMLElement {
 
     document.getElementById("book-side-panel").setAttribute("code", code);
     document.getElementById("book-side-panel").setAttribute("date", date);
-
     document.getElementById("book-side-panel").open = true;
-    document.getElementById("background-panel").open = true;
   }
 
   onOpen = function() {
