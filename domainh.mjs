@@ -83,25 +83,19 @@ function read(code, date) {
         } else {
             searchDownloadedPages(folder).then(files => {
                 if (files.length == 0) {
-                    resolve("empty");
+                    reject("empty");
                 } else {
                     ziph.createZip(files, outputPartialFile);
                     resolve(outputPartialFile);
                 }
             });
-            // If empty, then ret
         }
     }).then(e => {
-        console.log(e);
         return new Promise((resolve2, reject) => {
-          if (e != "empty") {
-            fs.readFile(e, "binary", (err, data) => {
-            if (err) reject(err);
-              resolve2(data);
-            });
-          } else {
-            resolve2("empty");
-          }
+          fs.readFile(e, "binary", (err, data) => {
+          if (err) reject(err);
+            resolve2(data);
+          });
         });
     });
 }
