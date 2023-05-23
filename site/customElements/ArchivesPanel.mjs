@@ -2,7 +2,7 @@ import { api } from "../api.mjs"
 import { dateh } from "../dateh.mjs"
 
 class ArchivesPanel extends HTMLElement {
-  
+
   archives = [];
   connectedCallback() {
     let element = this.shadowRoot.querySelector("ul");
@@ -21,7 +21,7 @@ class ArchivesPanel extends HTMLElement {
 
     let title = this.shadowRoot.querySelector(".title");
     let dwn = this;
-    title.onclick = function(event) {
+    title.onclick = function (event) {
       let element = dwn.shadowRoot.querySelector("ul");
       element.innerHTML = "Loading archives. Please wait";
       let code = document.getElementById("book-side-panel").getAttribute("code");
@@ -33,7 +33,7 @@ class ArchivesPanel extends HTMLElement {
         })
       });
     }
-    
+
     let imgs = this.shadowRoot.querySelectorAll("img-status");
     imgs.forEach(img => {
       let code = img.getAttribute("code");
@@ -43,7 +43,7 @@ class ArchivesPanel extends HTMLElement {
         img.disabled = data.status == "cover";
       });
 
-      img.onclick = function(event) {
+      img.onclick = function (event) {
         document.getElementById("book-side-panel").setAttribute("code", event.target.getAttribute("code"));
         document.getElementById("book-side-panel").setAttribute("date", event.target.getAttribute("date"));
         document.getElementById("book-side-panel").open = false;
@@ -54,18 +54,18 @@ class ArchivesPanel extends HTMLElement {
     });
   }
 
-  stop = function(event) {
-    
+  stop = function (event) {
+
   }
-  onOpen = function() {
+  onOpen = function () {
     let element = this.shadowRoot.querySelector("ul");
     element.innerHTML = "Click title to load archives";
   }
 
-  constructor(){
+  constructor() {
     super();
-      const shadow = this.attachShadow({mode: 'open'});
-      shadow.innerHTML = `
+    const shadow = this.attachShadow({ mode: 'open' });
+    shadow.innerHTML = `
       <style>
         div.title {
           text-transform: uppercase;
@@ -112,8 +112,8 @@ class ArchivesPanel extends HTMLElement {
       </ul>
       </div>
       `;
-    }
   }
-  
-  // Define the new element
-  customElements.define('archives-panel', ArchivesPanel);
+}
+
+// Define the new element
+customElements.define('archives-panel', ArchivesPanel);

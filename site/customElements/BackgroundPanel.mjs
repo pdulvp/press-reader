@@ -14,15 +14,15 @@
 import { domh } from "../domh.mjs"
 
 class BackgroundPanel extends HTMLElement {
-  
+
   get open() {
     let element = this.shadowRoot.querySelector("div");
     return !domh.hasClass(element, 'back-invisible')
   }
-  
+
   set open(val) {
     let element = this.shadowRoot.querySelector("div");
-    if(val) {
+    if (val) {
       domh.removeClass(element, 'back-invisible');
     } else {
       domh.addClass(element, 'back-invisible');
@@ -48,10 +48,10 @@ class BackgroundPanel extends HTMLElement {
 
   static get observedAttributes() { return ['close']; }
 
-  constructor(){
+  constructor() {
     super();
-      const shadow = this.attachShadow({mode: 'open'});
-      shadow.innerHTML = `
+    const shadow = this.attachShadow({ mode: 'open' });
+    shadow.innerHTML = `
       <style>
         .nav-side-background.back-invisible {
           display: none;

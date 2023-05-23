@@ -1,31 +1,35 @@
 <html>
+
 <head>
-    <meta charset="UTF-8">
-    <link href="css/main.css" rel="stylesheet"></link>
-    <script type="module" src="customElements/BookLink.mjs"></script>
-    <script type="module" src="customElements/SpinProgress.mjs"></script>
-    <script type="module" src="customElements/NavHeader.mjs"></script>
-    <script type="module" src="customElements/SidePanel.mjs"></script>
-    <script type="module" src="customElements/BackgroundPanel.mjs"></script>
-    <script type="module" src="customElements/DownloadsPanel.mjs"></script>
-    <script type="module" src="customElements/BookPanel.mjs"></script>
-    <script type="module" src="customElements/ArchivesPanel.mjs"></script>
-    <script type="module" src="customElements/BooksList.mjs"></script>
-    <script type="module" src="customElements/StatusImage.mjs"></script>
+  <meta charset="UTF-8">
+  <link href="css/main.css" rel="stylesheet">
+  </link>
+  <script type="module" src="customElements/BookLink.mjs"></script>
+  <script type="module" src="customElements/SpinProgress.mjs"></script>
+  <script type="module" src="customElements/NavHeader.mjs"></script>
+  <script type="module" src="customElements/SidePanel.mjs"></script>
+  <script type="module" src="customElements/BackgroundPanel.mjs"></script>
+  <script type="module" src="customElements/DownloadsPanel.mjs"></script>
+  <script type="module" src="customElements/BookPanel.mjs"></script>
+  <script type="module" src="customElements/ArchivesPanel.mjs"></script>
+  <script type="module" src="customElements/BooksList.mjs"></script>
+  <script type="module" src="customElements/StatusImage.mjs"></script>
 </head>
+
 <body>
-    <script type="module" src="index.mjs"></script>
-    <background-panel id="background-panel" close="nav-side-panel book-side-panel"></background-panel>
-    <nav-header expand="nav-side-panel" close="book-side-panel">
-        <a slot="content" href="/">List</a>
-    </nav-header>
-    <side-panel id="nav-side-panel" back="background-panel">
-        <downloads-panel slot="panel"></downloads-panel>
-    </side-panel>
-    <side-panel id="book-side-panel" back="background-panel">
-        <book-panel slot="panel"></book-panel>
-        <archives-panel slot="panel"></archives-panel>
-    </side-panel>
-    <div id="content"></div>
+  <script type="module" src="index.mjs"></script>
+  <background-panel id="background-panel" close="nav-side-panel book-side-panel"></background-panel>
+  <nav-header expand="nav-side-panel" close="book-side-panel">
+    <a slot="content" href="/">List</a>
+  </nav-header>
+  <side-panel id="nav-side-panel" back="background-panel">
+    <downloads-panel slot="panel"></downloads-panel>
+  </side-panel>
+  <side-panel id="book-side-panel" back="background-panel">
+    <book-panel slot="panel"></book-panel>
+    <archives-panel slot="panel"></archives-panel>
+  </side-panel>
+  <div id="content"></div>
 </body>
+
 </html>

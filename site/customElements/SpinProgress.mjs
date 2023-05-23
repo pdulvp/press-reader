@@ -14,7 +14,7 @@
 import { getPercent } from './SpinProgress.domain.mjs';
 
 class SpinProgress extends HTMLElement {
-  
+
   connectedCallback() {
     let svg = this.shadowRoot.querySelector("svg");
     let back = this.shadowRoot.querySelector(".back");
@@ -30,24 +30,24 @@ class SpinProgress extends HTMLElement {
     let textContent = this.getAttribute("text");
     var percents = getPercent(width, stroke, percent);
     text.textContent = textContent ? textContent : percent;
-    
+
     svg.setAttribute("width", `${width}`);
     svg.setAttribute("height", `${width}`);
     svg.setAttribute("viewport", `0 0 ${width} ${width}`);
-    
+
     back.setAttribute("stroke", "#EEEEEE");
     back.setAttribute("stroke-width", `${stroke}`);
     back.setAttribute("r", `${percents.rayon}`);
-    back.setAttribute("cx", `${width/2}`);
-    back.setAttribute("cy", `${width/2}`);
+    back.setAttribute("cx", `${width / 2}`);
+    back.setAttribute("cy", `${width / 2}`);
 
     bar.setAttribute("stroke", color);
     bar.setAttribute("stroke-width", `${stroke}`);
     bar.setAttribute("r", `${percents.rayon}`);
-    bar.setAttribute("cx", `${width/2}`);
-    bar.setAttribute("cy", `${width/2}`);
+    bar.setAttribute("cx", `${width / 2}`);
+    bar.setAttribute("cy", `${width / 2}`);
 
-    bar.setAttribute("transform", `rotate(270 ${width/2} ${width/2})`);
+    bar.setAttribute("transform", `rotate(270 ${width / 2} ${width / 2})`);
     bar.setAttribute("stroke-dasharray", `${percents.length}`);
     bar.setAttribute("stroke-dashoffset", `${percents.current}`);
   }
@@ -58,10 +58,10 @@ class SpinProgress extends HTMLElement {
 
   static get observedAttributes() { return ['percent']; }
 
-  constructor(){
+  constructor() {
     super();
-      const shadow = this.attachShadow({mode: 'open'});
-      shadow.innerHTML = `
+    const shadow = this.attachShadow({ mode: 'open' });
+    shadow.innerHTML = `
       <style>
         svg {
           all: initial;

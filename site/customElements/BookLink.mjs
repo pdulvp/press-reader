@@ -2,12 +2,12 @@ import { api } from "../api.mjs"
 import { dateh } from "../dateh.mjs"
 
 class BookLink extends HTMLElement {
-    
-  constructor(){
+
+  constructor() {
     super();
-      const shadow = this.attachShadow({mode: 'open'});
-      
-      shadow.innerHTML = `
+    const shadow = this.attachShadow({ mode: 'open' });
+
+    shadow.innerHTML = `
       <style>
         .root {
           width: 150px
@@ -35,10 +35,10 @@ class BookLink extends HTMLElement {
         </div>
       </div>
       `;
-    }
-  
+  }
+
   connectedCallback() {
-    
+
     let code = this.getAttribute('code');
     let date = this.getAttribute('date');
 
@@ -48,14 +48,14 @@ class BookLink extends HTMLElement {
       img.disabled = data.status == "cover";
     });
 
-    img.onclick = function(e) {
+    img.onclick = function (e) {
       document.getElementById("book-side-panel").setAttribute("code", code);
       document.getElementById("book-side-panel").setAttribute("date", date);
 
       document.getElementById("book-side-panel").open = true;
       document.getElementById("background-panel").open = true;
     }
-    
+
     this.shadowRoot.querySelector("a").href = `/read?code=${this.getAttribute('code')}&date=${this.getAttribute('date')}`;
     this.shadowRoot.querySelector("a").textContent = this.getAttribute('name');
     this.shadowRoot.querySelector("span").textContent = dateh.toReadable(this.getAttribute('date'));

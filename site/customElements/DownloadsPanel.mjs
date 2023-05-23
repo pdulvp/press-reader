@@ -2,7 +2,7 @@ import { api } from "../api.mjs"
 import { dateh } from "../dateh.mjs"
 
 class DownloadsPanel extends HTMLElement {
-    
+
   downloads = [];
   connectedCallback() {
     let element = this.shadowRoot.querySelector("ul");
@@ -12,7 +12,7 @@ class DownloadsPanel extends HTMLElement {
       <li>
         <div class="titleProgress" code="${d.code}" date="${d.date}" >
           <spin-progress class="spin-warn" text="${d.current}" percent="${percent}"></spin-progress>
-          <div class="titleSection ${d.inProgress?"":"stopped"}">
+          <div class="titleSection ${d.inProgress ? "" : "stopped"}">
             <span class="title">${d.name} ${d.inProgress ? "(in progress)" : ""}</span>
             <span class="abstract">${dateh.toReadable(d.date)}</span>
           </div>
@@ -37,14 +37,14 @@ class DownloadsPanel extends HTMLElement {
     }
   }
 
-  stopEvent = function(event) {
-    
+  stopEvent = function (event) {
+
   }
-  
-  spanEvent = function(event) {
+
+  spanEvent = function (event) {
     let code = event.target.getAttribute("code");
     let date = event.target.getAttribute("date");
-    
+
     document.getElementById("nav-side-panel").open = false;
 
     document.getElementById("book-side-panel").setAttribute("code", code);
@@ -52,17 +52,17 @@ class DownloadsPanel extends HTMLElement {
     document.getElementById("book-side-panel").open = true;
   }
 
-  onOpen = function() {
+  onOpen = function () {
     api.fetch.downloads().then(d => {
       this.downloads = d.reverse().slice(0, 10);
       this.connectedCallback();
     });
   }
 
-  constructor(){
+  constructor() {
     super();
-      const shadow = this.attachShadow({mode: 'open'});
-      shadow.innerHTML = `
+    const shadow = this.attachShadow({ mode: 'open' });
+    shadow.innerHTML = `
       <style>
         div.titleSection {
           display: flex;
@@ -124,8 +124,8 @@ class DownloadsPanel extends HTMLElement {
       </ul>
       </div>
       `;
-    }
   }
-  
-  // Define the new element
-  customElements.define('downloads-panel', DownloadsPanel);
+}
+
+// Define the new element
+customElements.define('downloads-panel', DownloadsPanel);

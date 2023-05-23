@@ -2,19 +2,19 @@ import { api } from "../api.mjs"
 import { dateh } from "../dateh.mjs"
 
 class BookPanel extends HTMLElement {
-    
+
   status = undefined;
 
   connectedCallback() {
     let img = this.shadowRoot.querySelector("img-status");
     let code = document.getElementById("book-side-panel").getAttribute("code");
     let date = document.getElementById("book-side-panel").getAttribute("date");
-    
+
     if (code != "null" && date != "null" && code != null && date != null) {
       api.fetch.thumb(code, date).then(data => {
         img.src = data.thumbnail;
         img.disabled = data.status == "cover";
-        img.onclick = function(e) {
+        img.onclick = function (e) {
           if (data.status != "date") {
             fetch(`/api/download?code=${code}&date=${date}&type=cover`).then(e => {
               setTimeout(() => {
@@ -25,7 +25,7 @@ class BookPanel extends HTMLElement {
           }
         }
       })
-      
+
       let readable = dateh.toReadable(date);
       this.shadowRoot.querySelector(".date").textContent = readable;
     }
@@ -34,8 +34,8 @@ class BookPanel extends HTMLElement {
       let links = [];
       if (this.status.status != "empty") links.push(`<a href="/read?code=${code}&date=${date}">read</a>`);
       if (this.status.status != "complete") links.push(`<a class="download">download</a> (<a class="download-full">full</a>)`);
-      
-      if (this.status.current != undefined && this.status.total != undefined ) {
+
+      if (this.status.current != undefined && this.status.total != undefined) {
         let percent = parseInt((parseInt(this.status.current) / parseInt(this.status.total)) * 100);
         links.push(`<spin-progress class="spin-warn" text="${this.status.current}" percent="${percent}"></spin-progress>`);
       }
@@ -43,9 +43,9 @@ class BookPanel extends HTMLElement {
         links.push(`<spin-progress class="spin-warn" text="✔" percent="100"></spin-progress>`);
       }
       this.shadowRoot.querySelector(".links").innerHTML = links.join(" - ");
-        
+
       let download = this.shadowRoot.querySelector("a.download");
-      download.onclick = function(e) {
+      download.onclick = function (e) {
         fetch(`/api/download?code=${code}&date=${date}`).then(e => {
           console.log(e);
         });
@@ -53,7 +53,7 @@ class BookPanel extends HTMLElement {
       }
 
       let downloadFull = this.shadowRoot.querySelector("a.download-full");
-      downloadFull.onclick = function(e) {
+      downloadFull.onclick = function (e) {
         fetch(`/api/download?code=${code}&date=${date}&type=full`).then(e => {
           console.log(e);
         });
@@ -61,13 +61,13 @@ class BookPanel extends HTMLElement {
       }
 
     }
-    
+
   }
 
-  onOpen = function() {
+  onOpen = function () {
     let code = document.getElementById("book-side-panel").getAttribute("code");
     let date = document.getElementById("book-side-panel").getAttribute("date");
-    api.fetch.status([{code: code, date: date}]).then(e => {
+    api.fetch.status([{ code: code, date: date }]).then(e => {
       this.status = e[0].status;
       this.connectedCallback();
     })
@@ -79,10 +79,10 @@ class BookPanel extends HTMLElement {
 
   static get observedAttributes() { return ['code', 'date', 'status', 'current', 'total']; }
 
-  constructor(){
+  constructor() {
     super();
-      const shadow = this.attachShadow({mode: 'open'});
-      shadow.innerHTML = `
+    const shadow = this.attachShadow({ mode: 'open' });
+    shadow.innerHTML = `
       <style>
         span.title {
           text-transform: uppercase;
@@ -107,8 +107,8 @@ class BookPanel extends HTMLElement {
         <div class="links"></div>
       </div>
       `;
-    }
   }
-  
-  // Define the new element
-  customElements.define('book-panel', BookPanel);
+}
+
+// Define the new element
+customElements.define('book-panel', BookPanel);

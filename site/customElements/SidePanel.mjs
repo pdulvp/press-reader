@@ -19,9 +19,9 @@ class SidePanel extends HTMLElement {
     let element = this.shadowRoot.querySelector("nav");
     return domh.hasClass(element, 'slide-in')
   }
-  
+
   set open(val) {
-    if(val) {
+    if (val) {
       let element = this.shadowRoot.querySelector("nav");
       domh.addClass(element, 'slide-in');
       domh.removeClass(element, 'slide-out');
@@ -44,7 +44,7 @@ class SidePanel extends HTMLElement {
   }
 
   connectedCallback() {
-    
+
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -53,14 +53,14 @@ class SidePanel extends HTMLElement {
       domh.removeClass(this.shadowRoot.querySelector("nav"), oldValue);
       domh.addClass(this.shadowRoot.querySelector("nav"), newValue);
     }
-   }
+  }
 
   static get observedAttributes() { return ['class']; }
 
-  constructor(){
+  constructor() {
     super();
-      const shadow = this.attachShadow({mode: 'open'});
-      shadow.innerHTML = `
+    const shadow = this.attachShadow({ mode: 'open' });
+    shadow.innerHTML = `
       <style>
         .slide-in {
           animation: slide-in 0.2s forwards;

@@ -13,9 +13,9 @@
  */
 
 class NavHeader extends HTMLElement {
-  
+
   connectedCallback() {
-    
+
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -39,10 +39,10 @@ class NavHeader extends HTMLElement {
 
   static get observedAttributes() { return ['expand']; }
 
-  constructor(){
+  constructor() {
     super();
-      const shadow = this.attachShadow({mode: 'open'});
-      shadow.innerHTML = `
+    const shadow = this.attachShadow({ mode: 'open' });
+    shadow.innerHTML = `
       <style>
         nav.header {
           position: sticky;

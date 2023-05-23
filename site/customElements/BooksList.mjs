@@ -5,8 +5,8 @@ class BooksList extends HTMLElement {
     api.list().then(e => {
       let groups = {};
       e.forEach(a => {
-          if (groups[a.group] == undefined) groups[a.group] = 0;
-          groups[a.group]++;
+        if (groups[a.group] == undefined) groups[a.group] = 0;
+        groups[a.group]++;
       });
 
       let selectedGroup = this.getAttribute("group");
@@ -15,15 +15,15 @@ class BooksList extends HTMLElement {
           return `<li><book-link code="${a.code}" date="${a.latest.date}" name="${a.name}"></book-link></li>`;
         }).join("");
 
-        let ul = `<ul class="books">`+result+`</ul>`;
+        let ul = `<ul class="books">` + result + `</ul>`;
         this.shadowRoot.querySelector(".list").innerHTML = ul;
       }
-        
-      let i=0;
+
+      let i = 0;
       let result2 = Object.keys(groups).map(k => {
         return `<li group="${k}" ${selectedGroup == k ? "selected=true" : ""} class="button button-${i++}" >${k}</li>`;
       }).join("");
-      let ul2 = `<ul class="groups">`+result2+`</ul>`;
+      let ul2 = `<ul class="groups">` + result2 + `</ul>`;
       this.shadowRoot.querySelector(".groups").innerHTML = ul2;
 
       let dnd = this;
@@ -41,10 +41,10 @@ class BooksList extends HTMLElement {
 
   static get observedAttributes() { return ['group']; }
 
-  constructor(){
+  constructor() {
     super();
-      const shadow = this.attachShadow({mode: 'open'});
-      shadow.innerHTML = `
+    const shadow = this.attachShadow({ mode: 'open' });
+    shadow.innerHTML = `
       <style>
         .button {
           padding: 10px;
@@ -101,8 +101,8 @@ class BooksList extends HTMLElement {
         <div class="list"></div>
       </div>
       `;
-    }
   }
-  
-  // Define the new element
-  customElements.define('books-list', BooksList);
+}
+
+// Define the new element
+customElements.define('books-list', BooksList);

@@ -8,7 +8,7 @@ if (process.argv[2] == undefined) {
   console.log("An accessor to a press service is required");
   process.exit();
 }
-if (!fs.existsSync("./"+process.argv[2])) {
+if (!fs.existsSync("./" + process.argv[2])) {
   console.log("The specified accessor doesn't exist");
   process.exit();
 }
@@ -32,21 +32,21 @@ var api = {
 
 console.log(api);
 
-var ContentTypes = { 
-	cbz:   { contentType: 'application/zip', encoding: "binary" },
-	cjs:   { contentType: 'text/javascript', encoding: "utf-8" },
-	mjs:   { contentType: 'text/javascript', encoding: "utf-8" },
-	js:    { contentType: 'text/javascript', encoding: "utf-8" },
-	css:   { contentType: 'text/css', encoding: "utf-8" },
-	woff2: { contentType: 'font/woff2', encoding: "binary" },
-	json:  { contentType: 'application/json', encoding: "utf-8" },
-	png:   { contentType: 'image/png', encoding: "binary" },
-	jpg:   { contentType: 'image/jpg', encoding: "binary" },
-	pdf:   { contentType: 'pdf', encoding: "binary" },
-	ttf:   { contentType: 'font/ttf', encoding: "binary" },
-	html:  { contentType: 'text/html; charset=utf-8', encoding: "utf-8" },
-	map:   { contentType: 'text/plain', encoding: "utf-8" },
-	svg:   { contentType: 'image/svg+xml', encoding: "utf-8" },
+var ContentTypes = {
+  cbz: { contentType: 'application/zip', encoding: "binary" },
+  cjs: { contentType: 'text/javascript', encoding: "utf-8" },
+  mjs: { contentType: 'text/javascript', encoding: "utf-8" },
+  js: { contentType: 'text/javascript', encoding: "utf-8" },
+  css: { contentType: 'text/css', encoding: "utf-8" },
+  woff2: { contentType: 'font/woff2', encoding: "binary" },
+  json: { contentType: 'application/json', encoding: "utf-8" },
+  png: { contentType: 'image/png', encoding: "binary" },
+  jpg: { contentType: 'image/jpg', encoding: "binary" },
+  pdf: { contentType: 'pdf', encoding: "binary" },
+  ttf: { contentType: 'font/ttf', encoding: "binary" },
+  html: { contentType: 'text/html; charset=utf-8', encoding: "utf-8" },
+  map: { contentType: 'text/plain', encoding: "utf-8" },
+  svg: { contentType: 'image/svg+xml', encoding: "utf-8" },
 };
 
 var processor = {
@@ -62,7 +62,7 @@ var processor = {
   },
 
   writeHead: (type, value) => { processor.head[type] = value },
-  end: (res, lastContent, type) => { 
+  end: (res, lastContent, type) => {
     if (type) {
       processor.writeHead("Content-Type", type.contentType);
     }
@@ -74,31 +74,31 @@ var processor = {
 
 function proceedRequest(request, res) {
   let url = new URL("https://" + hostname + request.url);
-  console.log(url.pathname + " "+url.searchParams);
+  console.log(url.pathname + " " + url.searchParams);
 
-  let rules = { 
-    code: (code) => { return { status: code != null && code.match(/^[a-zA-Z0-9_]+$/) != null, msg: "code invalid format" } } ,
+  let rules = {
+    code: (code) => { return { status: code != null && code.match(/^[a-zA-Z0-9_]+$/) != null, msg: "code invalid format" } },
     date: (date) => { return { status: date != null && date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) != null, msg: "date invalid format" } },
     download: {
       type: (type) => { return { status: type == "cover" || type == "full" || type == null, msg: "type invalid format" } }
     }
   };
 
-  let customElements = [ "customElements/BooksList", "customElements/StatusImage", "customElements/BookLink", "customElements/BookPanel", "customElements/ArchivesPanel", "customElements/SpinProgress", 
-  "customElements/SpinProgress.domain", "customElements/NavHeader", "customElements/BackgroundPanel", "customElements/DownloadsPanel", "customElements/SidePanel"];
-  
+  let customElements = ["customElements/BooksList", "customElements/StatusImage", "customElements/BookLink", "customElements/BookPanel", "customElements/ArchivesPanel", "customElements/SpinProgress",
+    "customElements/SpinProgress.domain", "customElements/NavHeader", "customElements/BackgroundPanel", "customElements/DownloadsPanel", "customElements/SidePanel"];
+
   let modules = ["api", "domh", "index", "dateh", "accessorh/sampleh"];
 
   let css = ["css/main"];
-  
+
   let file = request.url.substring(1, request.url.length - 4);
-  
+
   if (modules.includes(file) || customElements.includes(file)) {
-    processor.end(res, fs.readFileSync("site/"+file+".mjs"), ContentTypes.mjs);
-    
+    processor.end(res, fs.readFileSync("site/" + file + ".mjs"), ContentTypes.mjs);
+
   } else if (css.includes(file)) {
-    processor.end(res, fs.readFileSync("site/"+file+".css"), ContentTypes.css);
-    
+    processor.end(res, fs.readFileSync("site/" + file + ".css"), ContentTypes.css);
+
   } else if (request.url == '/') {
     processor.end(res, fs.readFileSync("site/index.html"), ContentTypes.html);
 
@@ -119,7 +119,7 @@ function proceedRequest(request, res) {
         processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
       })
     });
-    
+
   } else if (url.pathname == '/thumb') {
     let { code, date } = processor.params(url, { code: rules.code, date: rules.date }, res);
     api.fetch.thumb(code, date).then(r => {
@@ -127,7 +127,7 @@ function proceedRequest(request, res) {
       processor.writeHead("X-Thumbnail-Status", r.status);
       processor.end(res, r.thumbnail, ContentTypes.png);
     });
-    
+
   } else if (url.pathname == '/read') {
     let { code, date } = processor.params(url, { code: rules.code, date: rules.date }, res);
     api.fetch.read(code, date).then(r => {
@@ -157,7 +157,7 @@ function proceedRequest(request, res) {
     });
 
   } else {
-    processor.end(res, JSON.stringify({status: "error", message: `Unknown url: ${request.url}`}, null, ""), ContentTypes.json);
+    processor.end(res, JSON.stringify({ status: "error", message: `Unknown url: ${request.url}` }, null, ""), ContentTypes.json);
   }
 }
 
@@ -169,7 +169,7 @@ server.on("request", (request, res) => {
   try {
     proceedRequest(request, res);
   } catch (e) {
-    processor.end(res, JSON.stringify({status: "error", message: `An error occured : ${e}`}, null, ""), ContentTypes.json);
+    processor.end(res, JSON.stringify({ status: "error", message: `An error occured : ${e}` }, null, ""), ContentTypes.json);
   }
 });
 
