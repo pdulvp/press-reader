@@ -2,6 +2,7 @@ import fs from 'fs';
 import http from "http";
 import fDomainh from "./domainh.mjs";
 import requesth from "./utils/requesth.js"
+import urlh from './utils/urlh.js';
 
 if (process.argv[2] == undefined) {
   console.log("An accessor to a press service is required");
@@ -50,6 +51,16 @@ var ContentTypes = {
 
 var processor = {
   head: {},
+  params: (url, rules, res) => {
+    let result = urlh.check(url, rules);
+    if (result.find(r => !r.status)) {
+      processor.end(res, JSON.stringify(result.filter(c => !c.status).map(c => c.msg).join(","), null, ""), ContentTypes.json);
+    }
+    result = {};
+    Object.keys(rules).forEach(k => result[k] = url.searchParams.get(k));
+    return result;
+  },
+
   writeHead: (type, value) => { processor.head[type] = value },
   end: (res, lastContent, type) => { 
     if (type) {
@@ -65,6 +76,14 @@ function proceedRequest(request, res) {
   let url = new URL("https://" + hostname + request.url);
   console.log(url.pathname + " "+url.searchParams);
 
+  let rules = { 
+    code: (code) => { return { status: code != null && code.match(/^[a-zA-Z0-9_]+$/) != null, msg: "code invalid format" } } ,
+    date: (date) => { return { status: date != null && date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) != null, msg: "date invalid format" } },
+    download: {
+      type: (type) => { return { status: type == "cover" || type == "full" || type == null, msg: "type invalid format" } }
+    }
+  };
+
   let customElements = [ "customElements/BooksList", "customElements/StatusImage", "customElements/BookLink", "customElements/BookPanel", "customElements/ArchivesPanel", "customElements/SpinProgress", 
   "customElements/SpinProgress.domain", "customElements/NavHeader", "customElements/BackgroundPanel", "customElements/DownloadsPanel", "customElements/SidePanel"];
   
@@ -74,10 +93,7 @@ function proceedRequest(request, res) {
   
   let file = request.url.substring(1, request.url.length - 4);
   
-  if (modules.includes(file)) {
-    processor.end(res, fs.readFileSync("site/"+file+".mjs"), ContentTypes.mjs);
-    
-  } else if (customElements.includes(file)) {
+  if (modules.includes(file) || customElements.includes(file)) {
     processor.end(res, fs.readFileSync("site/"+file+".mjs"), ContentTypes.mjs);
     
   } else if (css.includes(file)) {
@@ -86,16 +102,13 @@ function proceedRequest(request, res) {
   } else if (request.url == '/') {
     processor.end(res, fs.readFileSync("site/index.html"), ContentTypes.html);
 
-  } else if (request.url == '/debug') {
-    processor.end(res, fs.readFileSync("site/index.html"), ContentTypes.html);
-
   } else if (url.pathname == '/api/list') {
     api.list().then(e => {
       processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
     });
 
   } else if (url.pathname == '/api/archives') {
-    let code = url.searchParams.get("code");
+    let { code } = processor.params(url, { code: rules.code }, res);
     api.archives(code).then(e => {
       processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
     });
@@ -108,8 +121,7 @@ function proceedRequest(request, res) {
     });
     
   } else if (url.pathname == '/thumb') {
-    let code = url.searchParams.get("code");
-    let date = url.searchParams.get("date");
+    let { code, date } = processor.params(url, { code: rules.code, date: rules.date }, res);
     api.fetch.thumb(code, date).then(r => {
       processor.writeHead("Content-Disposition", "attachment;filename=" + code + date + ".png");
       processor.writeHead("X-Thumbnail-Status", r.status);
@@ -117,8 +129,7 @@ function proceedRequest(request, res) {
     });
     
   } else if (url.pathname == '/read') {
-    let code = url.searchParams.get("code");
-    let date = url.searchParams.get("date");
+    let { code, date } = processor.params(url, { code: rules.code, date: rules.date }, res);
     api.fetch.read(code, date).then(r => {
       if (r.status == undefined) {
         processor.writeHead("Content-Disposition", "attachment;filename=" + code + date + ".cbz");
@@ -129,9 +140,7 @@ function proceedRequest(request, res) {
     });
 
   } else if (url.pathname == '/api/download') {
-    let code = url.searchParams.get("code");
-    let date = url.searchParams.get("date");
-    let type = url.searchParams.get("type");
+    let { code, date, type } = processor.params(url, { code: rules.code, date: rules.date, type: rules.download.type }, res);
     api.fetch.download(code, date, type).then(r => {
       processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
     });
@@ -142,8 +151,7 @@ function proceedRequest(request, res) {
     });
 
   } else if (url.pathname == '/api/stop') {
-    let code = url.searchParams.get("code");
-    let date = url.searchParams.get("date");
+    let { code, date } = processor.params(url, { code: rules.code, date: rules.date }, res);
     api.fetch.stop(code, date).then(r => {
       processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
     });
