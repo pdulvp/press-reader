@@ -1,4 +1,5 @@
 import { api } from "../api.mjs"
+import { dateh } from "../dateh.mjs"
 
 class DownloadsPanel extends HTMLElement {
     
@@ -9,9 +10,16 @@ class DownloadsPanel extends HTMLElement {
       let percent = parseInt((parseInt(d.current) / parseInt(d.total)) * 100);
       return `
       <li>
-        <spin-progress class="spin-warn" text="${d.current}" percent="${percent}"></spin-progress>
-        <div code="${d.code}" date="${d.date}" class="${d.inProgress?"":"stopped"}">${d.code} ${d.inProgress ? "(in progress)" : ""}</div>
+        <div class="titleProgress" code="${d.code}" date="${d.date}" >
+          <spin-progress class="spin-warn" text="${d.current}" percent="${percent}"></spin-progress>
+          <div class="titleSection ${d.inProgress?"":"stopped"}">
+            <span class="title">${d.name} ${d.inProgress ? "(in progress)" : ""}</span>
+            <span class="abstract">${dateh.toReadable(d.date)}</span>
+          </div>
+        </div>
+        <div class="actions"> 
         ${d.inProgress ? `<a href="/api/stop?code=${d.code}&date=${d.date}">stop</a>` : ``}
+        </div>
       </li>`;
     }).join("");
     if (this.downloads.length == 0) {
@@ -23,15 +31,16 @@ class DownloadsPanel extends HTMLElement {
       stop.onclick = this.stopEvent;
     }
 
-    let span = this.shadowRoot.querySelector("div");
+    let span = this.shadowRoot.querySelectorAll("div.titleProgress");
     if (span) {
-      span.onclick = this.spanEvent;
+      span.forEach(s => s.onclick = this.spanEvent);
     }
   }
 
   stopEvent = function(event) {
     
   }
+  
   spanEvent = function(event) {
     let code = event.target.getAttribute("code");
     let date = event.target.getAttribute("date");
@@ -55,9 +64,19 @@ class DownloadsPanel extends HTMLElement {
       const shadow = this.attachShadow({mode: 'open'});
       shadow.innerHTML = `
       <style>
-        span.title {
-          text-transform: uppercase;
+        div.titleSection {
+          display: flex;
+          flex-direction: column;
+        }
+        div.titleSection > span {
+          flex-grow: 1;
+        }
+        span.root-title {
           font-weight: bold;
+          text-transform: uppercase;
+        }
+        span.abstract {
+          font-size: 12px; color: gray
         }
         div.stopped {
           text-decoration: line-through;
@@ -74,14 +93,20 @@ class DownloadsPanel extends HTMLElement {
           display: flex;
           flex-direction: column;
           list-style-type: none;
-          gap: 10px;
+          gap: 20px;
         }
         li {
           padding: 0px;
+        }
+        li div.titleProgress {
           display: flex;
           flex-direction: row;
           align-items: center;
           gap: 10px;
+        }
+        li div.actions {
+          display: flex;
+          flex-direction: row-reverse;
         }
         li span {
           flex-grow: 1;
@@ -94,7 +119,7 @@ class DownloadsPanel extends HTMLElement {
         }
       </style>
       <div class="root">
-      <span class="title">Downloads</span>
+      <span class="root-title">Downloads</span>
       <ul class="ul">
       </ul>
       </div>

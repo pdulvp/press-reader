@@ -181,6 +181,21 @@ function download(code, date, type = null) {
       return Promise.resolve(e);
     });
   }
+  function getDownloads(code) {
+    let dwn = currentDownloads.filter(c => code == null || c.code == code);
+    return accessorh.getBooks().then(books => {
+        dwn.forEach(d => {
+            let book = books.find(b => b.code == d.code);
+            if (book) {
+                d.name = book.name;
+            } else {
+                d.name = book.code;
+            }
+        });
+        return Promise.resolve(dwn);
+    });
+  }
+
 
   function getThumbnail(code, date) {
     let thumb = undefined;
@@ -237,7 +252,7 @@ var domainh = {
     download: download,
     stopDownload: stopDownload,
     getThumbnail: getThumbnail,
-    getDownloads: (code) => { return Promise.resolve(currentDownloads.filter(c => code == null || c.code == code)); },
+    getDownloads: getDownloads,
     getStatus: getStatus
 }
 
