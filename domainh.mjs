@@ -24,7 +24,8 @@ function getPages(code, date) {
 
 function searchDownloadedPages(folder) {
   return fsh.getFiles(folder).then(files => {
-    return Promise.resolve(files.filter(file => file.endsWith(".png") && !(file.endsWith("thumbnail.png"))));
+    let pages = files.filter(file => file.endsWith(".png") && !(file.endsWith("thumbnail.png")));
+    return Promise.resolve(pages);
   });
 }
 
@@ -38,35 +39,35 @@ function getStatus(codes) {
 }
 
 function unaryStatus(code, date) {
-  return new Promise((resolve, reject) => {
-    date = dateh.formatDate(date, "-");
-    let folder = `results/${code}/${date}`;
-    let outputFile = `${folder}/${code}_${date}.cbz`;
-    if (fsh.fileExists(outputFile)) {
-      resolve({ status: "complete" });
+  date = dateh.formatDate(date, "-");
+  let folder = `results/${code}/${date}`;
+  let outputFile = `${folder}/${code}_${date}.cbz`;
 
+  if (fsh.fileExists(outputFile)) {
+    return Promise.resolve({ status: "complete" });
+  }
+
+  let download = findDownload(code, date, false);
+  if (download != null) {
+    if (download.inProgress) {
+      return Promise.resolve({ status: "in progress", current: download.current, total: download.total });
     } else {
-      let download = findDownload(code, date, false);
-      if (download != null) {
-        if (download.inProgress) {
-          resolve({ status: "in progress", current: download.current, total: download.total });
-        } else {
-          resolve({ status: "stopped", current: download.current, total: download.total });
-        }
-      } else {
-        searchDownloadedPages(folder).then(files => {
-          if (files.length > 0) { //previous partial
-            getPages(code, date).then(pages => {
-              resolve({ status: "partial", current: files.length, total: pages.length });
-            }).catch(e => {
-              resolve({ status: "error:" + e });
-            });
-          } else {
-            resolve({ status: "empty" });
-          }
-        });
-      }
+      return Promise.resolve({ status: "stopped", current: download.current, total: download.total });
     }
+  }
+
+  return new Promise((resolve, reject) => {
+    searchDownloadedPages(folder).then(files => {
+      if (files.length > 0) { //previous partial
+        getPages(code, date).then(pages => {
+          resolve({ status: "partial", current: files.length, total: pages.length });
+        }).catch(e => {
+          resolve({ status: "error:" + e });
+        });
+      } else {
+        resolve({ status: "empty" });
+      }
+    });
   });
 }
 
@@ -82,19 +83,19 @@ function read(code, date) {
 
     } else {
       searchDownloadedPages(folder).then(files => {
-        if (files.length == 0) {
-          reject("empty");
-        } else {
+        if (files.length > 0) {
           ziph.createZip(files, outputPartialFile);
           resolve(outputPartialFile);
+        } else {
+          reject({ status: "empty" });
         }
       });
     }
   }).then(e => {
-    return new Promise((resolve2, reject) => {
+    return new Promise((resolve, reject) => {
       fs.readFile(e, "binary", (err, data) => {
         if (err) reject(err);
-        resolve2(data);
+        resolve(data);
       });
     });
   });
@@ -109,7 +110,7 @@ function stopDownload(code, date) {
   return Promise.resolve(true);
 }
 
-let pagesQueue = promiseh.newQueue(() => Math.round(Math.random() * 1000) + 500);
+let pagesQueue = promiseh.newQueue(() => Math.round(Math.random() * 2000) + 3000);
 let imagesQueue = promiseh.newQueue(() => Math.round(Math.random() * 18000) + 15000);
 
 function download(code, date, type = null) {
@@ -118,69 +119,63 @@ function download(code, date, type = null) {
   let outputFile = `${folder}/${code}_${date}.cbz`;
   let outputPartialFile = `${folder}/${code}_${date}-partial.cbz`;
 
-  return new Promise((resolve, reject) => {
-    if (fsh.fileExists(outputFile)) {
-      resolve({ status: "downloadComplete" });
+  if (fsh.fileExists(outputFile)) {
+    return Promise.resolve({ status: "downloadComplete" });
+  }
 
-    } else {
-      let download = findDownload(code, date);
-      console.log(currentDownloads);
-      if (!download.inProgress) {
-        download.inProgress = true;
+  let download = findDownload(code, date);
+  console.log(currentDownloads);
+  if (download.inProgress) {
+    return Promise.resolve({ status: "inProgress" });
+  }
 
-        pagesQueue.push(() => {
-          return getPages(code, date).then(e => {
-            download.total = e.length;
+  download.inProgress = true;
 
-            let ea = e.filter(r => {
-              let imageFile = `${folder}/${r}.png`;
-              return !fsh.fileExists(imageFile);
-            });
-            download.current = download.total - ea.length;
-            if (type == "cover") {
-              ea = ea.slice(0, 1);
-            } else if (type != "full") {
-              ea = ea.slice(0, 3);
-            }
+  pagesQueue.push(() => {
+    return getPages(code, date).then(allPages => {
+      download.total = allPages.length;
 
-            imagesQueue.push(ea.map((e, i) => () => {
-              console.log(`  proceed image ${e}`);
-              let imageId = e;
-              if (download.inProgress == false) {
-                return Promise.resolve(false);
-              }
-              let imageFile = `${folder}/${imageId}.png`;
-              download.current++;
-
-              return accessorh.getImage(imageId).then(tt => {
-                return fsh.write(imageFile, tt).then(e => {
-                  console.log('The file has been saved!');
-                  return Promise.resolve(true);
-                });
-              }).then(ee => {
-                if (download.total == download.current) {
-                  searchDownloadedPages(folder).then(files => {
-                    ziph.createZip(files, outputFile);
-                    download.inProgress = false;
-                  });
-                } else if (i == ea.length - 1) {
-                  download.inProgress = false;
-                }
-              });
-            }), type == "cover");
-          });
-        });
-        resolve({ status: "inProgress" });
-
-      } else {
-        resolve({ status: "inProgress" });
+      let remainingPages = allPages.filter(r => {
+        let imageFile = `${folder}/${r}.png`;
+        return !fsh.fileExists(imageFile);
+      });
+      download.current = download.total - remainingPages.length;
+      if (type == "cover") {
+        remainingPages = remainingPages.slice(0, 1);
+      } else if (type != "full") {
+        remainingPages = remainingPages.slice(0, 3);
       }
-    }
-  }).then(e => {
-    console.log(e);
-    return Promise.resolve(e);
+
+      imagesQueue.push(remainingPages.map((page, i) => () => {
+        console.log(`  proceed image ${page}`);
+        let imageId = page;
+        if (download.inProgress == false) {
+          return Promise.resolve(false);
+        }
+        let imageFile = `${folder}/${imageId}.png`;
+        download.current++;
+
+        return accessorh.getImage(imageId).then(tt => {
+          return fsh.write(imageFile, tt).then(e => {
+            console.log('The file has been saved!');
+            return Promise.resolve(true);
+          });
+        }).then(ee => {
+          if (download.total == download.current) {
+            searchDownloadedPages(folder).then(files => {
+              ziph.createZip(files, outputFile);
+              download.inProgress = false;
+            });
+          } else if (i == remainingPages.length - 1) {
+            download.inProgress = false;
+          }
+        });
+      }), type == "cover");
+    });
   });
+  return Promise.resolve({ status: "inProgress" });
 }
+
 function getDownloads(code) {
   let dwn = currentDownloads.filter(c => code == null || c.code == code);
   return accessorh.getBooks().then(books => {
