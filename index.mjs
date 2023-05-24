@@ -51,10 +51,10 @@ var ContentTypes = {
 
 var processor = {
   head: {},
-  params: (url, rules, res) => {
+  params: (url, rules) => {
     let result = urlh.check(url, rules);
     if (result.find(r => !r.status)) {
-      processor.end(res, JSON.stringify(result.filter(c => !c.status).map(c => c.msg).join(","), null, ""), ContentTypes.json);
+      throw new Error('Wrong parameters: ' + result.filter(c => !c.status).map(c => c.msg).join(","));
     }
     result = {};
     Object.keys(rules).forEach(k => result[k] = url.searchParams.get(k));
@@ -108,7 +108,7 @@ function proceedRequest(request, res) {
     });
 
   } else if (url.pathname == '/api/archives') {
-    let { code } = processor.params(url, { code: rules.code }, res);
+    let { code } = processor.params(url, { code: rules.code });
     api.archives(code).then(e => {
       processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
     });
@@ -121,7 +121,7 @@ function proceedRequest(request, res) {
     });
 
   } else if (url.pathname == '/thumb') {
-    let { code, date } = processor.params(url, { code: rules.code, date: rules.date }, res);
+    let { code, date } = processor.params(url, { code: rules.code, date: rules.date });
     api.fetch.thumb(code, date).then(r => {
       processor.writeHead("Content-Disposition", "attachment;filename=" + code + date + ".png");
       processor.writeHead("X-Thumbnail-Status", r.status);
@@ -129,18 +129,18 @@ function proceedRequest(request, res) {
     });
 
   } else if (url.pathname == '/read') {
-    let { code, date } = processor.params(url, { code: rules.code, date: rules.date }, res);
+    let { code, date } = processor.params(url, { code: rules.code, date: rules.date });
     api.fetch.read(code, date).then(r => {
       if (r.status == undefined) {
         processor.writeHead("Content-Disposition", "attachment;filename=" + code + date + ".cbz");
         processor.end(res, r, ContentTypes.cbz);
       } else {
-        processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
+        processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
       }
     });
 
   } else if (url.pathname == '/api/download') {
-    let { code, date, type } = processor.params(url, { code: rules.code, date: rules.date, type: rules.download.type }, res);
+    let { code, date, type } = processor.params(url, { code: rules.code, date: rules.date, type: rules.download.type });
     api.fetch.download(code, date, type).then(r => {
       processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
     });
@@ -151,7 +151,7 @@ function proceedRequest(request, res) {
     });
 
   } else if (url.pathname == '/api/stop') {
-    let { code, date } = processor.params(url, { code: rules.code, date: rules.date }, res);
+    let { code, date } = processor.params(url, { code: rules.code, date: rules.date });
     api.fetch.stop(code, date).then(r => {
       processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
     });
