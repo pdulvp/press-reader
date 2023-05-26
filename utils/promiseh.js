@@ -8,8 +8,6 @@
  @author: pdulvp@laposte.net
 */
 
-var consoleh = require("./consoleh");
-
 var promiseh = {
 
   //From an array of values and a function returning a promise from a value
@@ -42,10 +40,8 @@ var promiseh = {
       push: function (fPromise, first = false) {
         let toAdd = Array.isArray(fPromise) ? fPromise : [fPromise];
         if (first) {
-          console.log("push first");
           this.pendingPromises.unshift(...toAdd);
         } else {
-          console.log("push");
           this.pendingPromises.push(...toAdd);
         }
 
@@ -54,10 +50,7 @@ var promiseh = {
         }
       },
       proceedPending: function () {
-        consoleh.green("queue: " + this.pendingPromises.length);
-
         return new Promise((resolve, reject) => {
-          console.log("proceedPending");
           let current = this.pendingPromises.shift();
           if (current) {
             this.isExecuted = true;
@@ -68,12 +61,9 @@ var promiseh = {
                 });
               } else {
                 this.isExecuted = false;
-                console.log("queue is finishing");
                 resolve(e);
               }
             });
-          } else {
-            console.log("queue is empty");
           }
         });
       }
