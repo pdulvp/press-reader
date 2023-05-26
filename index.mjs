@@ -3,6 +3,7 @@ import http from "http";
 import fDomainh from "./domainh.mjs";
 import requesth from "./utils/requesth.js"
 import urlh from './utils/urlh.js';
+import consoleh from './utils/consoleh.js';
 
 if (process.argv[2] == undefined) {
   console.log("An accessor to a press service is required");
@@ -93,6 +94,11 @@ function proceedRequest(request, res) {
 
   let file = request.url.substring(1, request.url.length - 4);
 
+  let errorHandler = (e) => {
+    consoleh.red(e);
+    processor.end(res, JSON.stringify({ status: "error", message: `An error occured. See logs` }, null, ""), ContentTypes.json);
+  };
+
   if (modules.includes(file) || customElements.includes(file)) {
     processor.end(res, fs.readFileSync("site/" + file + ".mjs"), ContentTypes.mjs);
 
@@ -105,20 +111,20 @@ function proceedRequest(request, res) {
   } else if (url.pathname == '/api/list') {
     api.list().then(e => {
       processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
-    });
+    }).catch(errorHandler);
 
   } else if (url.pathname == '/api/archives') {
     let { code } = processor.params(url, { code: rules.code });
     api.archives(code).then(e => {
       processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
-    });
+    }).catch(errorHandler);
 
   } else if (url.pathname == '/api/status') {
     requesth.json(request).then(json => {
       api.fetch.status(json).then(e => {
         processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
       })
-    });
+    }).catch(errorHandler);
 
   } else if (url.pathname == '/thumb') {
     let { code, date } = processor.params(url, { code: rules.code, date: rules.date });
@@ -126,7 +132,7 @@ function proceedRequest(request, res) {
       processor.writeHead("Content-Disposition", "attachment;filename=" + code + date + ".png");
       processor.writeHead("X-Thumbnail-Status", r.status);
       processor.end(res, r.thumbnail, ContentTypes.png);
-    });
+    }).catch(errorHandler);
 
   } else if (url.pathname == '/read') {
     let { code, date } = processor.params(url, { code: rules.code, date: rules.date });
@@ -137,24 +143,24 @@ function proceedRequest(request, res) {
       } else {
         processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
       }
-    });
+    }).catch(errorHandler);
 
   } else if (url.pathname == '/api/download') {
     let { code, date, type } = processor.params(url, { code: rules.code, date: rules.date, type: rules.download.type });
     api.fetch.download(code, date, type).then(r => {
       processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
-    });
+    }).catch(errorHandler);
 
   } else if (url.pathname == '/api/downloads') {
     api.fetch.downloads(null).then(r => {
       processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
-    });
+    }).catch(errorHandler);
 
   } else if (url.pathname == '/api/stop') {
     let { code, date } = processor.params(url, { code: rules.code, date: rules.date });
     api.fetch.stop(code, date).then(r => {
       processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
-    });
+    }).catch(errorHandler);
 
   } else {
     processor.end(res, JSON.stringify({ status: "error", message: `Unknown url: ${request.url}` }, null, ""), ContentTypes.json);
@@ -165,14 +171,17 @@ function proceedRequest(request, res) {
 const hostname = "127.0.0.1";
 const port = 8098;
 const server = http.createServer();
+
 server.on("request", (request, res) => {
+  res.on("error", e => {
+    consoleh.red(e);
+  });
   try {
     proceedRequest(request, res);
   } catch (e) {
-    processor.end(res, JSON.stringify({ status: "error", message: `An error occured : ${e}` }, null, ""), ContentTypes.json);
+    errorHandler(e);
   }
 });
-
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
