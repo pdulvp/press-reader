@@ -52,16 +52,6 @@ var ContentTypes = {
 
 var processor = {
   head: {},
-  params: (url, rules) => {
-    let result = urlh.check(url, rules);
-    if (result.find(r => !r.status)) {
-      throw new Error('Wrong parameters: ' + result.filter(c => !c.status).map(c => c.msg).join(","));
-    }
-    result = {};
-    Object.keys(rules).forEach(k => result[k] = url.searchParams.get(k));
-    return result;
-  },
-
   writeHead: (type, value) => { processor.head[type] = value },
   end: (res, lastContent, type) => {
     if (type) {
@@ -114,7 +104,7 @@ function proceedRequest(request, res) {
     }).catch(errorHandler);
 
   } else if (url.pathname == '/api/archives') {
-    let { code } = processor.params(url, { code: rules.code });
+    let { code } = urlh.params(url, { code: rules.code });
     api.archives(code).then(e => {
       processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
     }).catch(errorHandler);
@@ -127,7 +117,7 @@ function proceedRequest(request, res) {
     }).catch(errorHandler);
 
   } else if (url.pathname == '/thumb') {
-    let { code, date } = processor.params(url, { code: rules.code, date: rules.date });
+    let { code, date } = urlh.params(url, { code: rules.code, date: rules.date });
     api.fetch.thumb(code, date).then(r => {
       processor.writeHead("Content-Disposition", "attachment;filename=" + code + date + ".png");
       processor.writeHead("X-Thumbnail-Status", r.status);
@@ -135,7 +125,7 @@ function proceedRequest(request, res) {
     }).catch(errorHandler);
 
   } else if (url.pathname == '/read') {
-    let { code, date } = processor.params(url, { code: rules.code, date: rules.date });
+    let { code, date } = urlh.params(url, { code: rules.code, date: rules.date });
     api.fetch.read(code, date).then(r => {
       if (r.status == undefined) {
         processor.writeHead("Content-Disposition", "attachment;filename=" + code + date + ".cbz");
@@ -146,7 +136,7 @@ function proceedRequest(request, res) {
     }).catch(errorHandler);
 
   } else if (url.pathname == '/api/download') {
-    let { code, date, type } = processor.params(url, { code: rules.code, date: rules.date, type: rules.download.type });
+    let { code, date, type } = urlh.params(url, { code: rules.code, date: rules.date, type: rules.download.type });
     api.fetch.download(code, date, type).then(r => {
       processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
     }).catch(errorHandler);
@@ -157,7 +147,7 @@ function proceedRequest(request, res) {
     }).catch(errorHandler);
 
   } else if (url.pathname == '/api/stop') {
-    let { code, date } = processor.params(url, { code: rules.code, date: rules.date });
+    let { code, date } = urlh.params(url, { code: rules.code, date: rules.date });
     api.fetch.stop(code, date).then(r => {
       processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
     }).catch(errorHandler);
