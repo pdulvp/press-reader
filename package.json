@@ -5,12 +5,14 @@
   "main": "index.js",
   "scripts": {
     "sample": "node index.mjs site/accessorh/sampleh.mjs",
-    "test": "node --version"
+    "europresse": "node index.mjs accessorh/europresseh.mjs",
+    "test": "node --version",
+    "test2": "node site/customElements/SpinProgress.test.mjs",
+    "test3": "node index"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "adm-zip": "^0.5.10",
-    "pureimage": "^0.3.17"
+    "adm-zip": "^0.5.10"
   }
 }

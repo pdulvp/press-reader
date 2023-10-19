@@ -47,7 +47,26 @@ class StatusImage extends HTMLElement {
         .disabled {
           filter: saturate(-0);
         }
-        </style><img></img>`
+        .img-root {  
+          display: grid;
+          overflow: hidden;
+        }
+        /*.img {
+          z-index: 10;
+          grid-area: 1 / 1;
+          background-color: rgba(50,50,50,0.1);
+          font-family: Courier New;
+          transform: translate(-2.1rem, 2ex) rotate(-15deg);
+          font-size: 24px;
+          height: 75;
+          width: 140%;
+          font-weight: bold;
+        }*/
+        img {
+          grid-area: 1 / 1;
+        }
+        </style>
+        <div class="img-root"><img></img><div class="img"></div></div>`
   }
 }
 customElements.define('img-status', StatusImage);

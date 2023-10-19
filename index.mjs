@@ -157,8 +157,8 @@ function proceedRequest(request, res) {
   }
 }
 
-//const hostname = "192.168.1.18";
-const hostname = "127.0.0.1";
+const hostname = "192.168.1.18";
+//const hostname = "127.0.0.1";
 const port = 8098;
 const server = http.createServer();
 
@@ -169,7 +169,8 @@ server.on("request", (request, res) => {
   try {
     proceedRequest(request, res);
   } catch (e) {
-    errorHandler(e);
+    consoleh.red(e);
+    processor.end(res, JSON.stringify({ status: "error", message: `An error occured. See logs` }, null, ""), ContentTypes.json);
   }
 });
 server.listen(port, hostname, () => {

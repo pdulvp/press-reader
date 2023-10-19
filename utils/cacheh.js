@@ -26,7 +26,7 @@ var cacheh = {
           return fromCache(e);
         });
       } else {
-        fs.rmSync(cache);
+        fs.rmSync(cache, { force: true, });
       }
     }
 

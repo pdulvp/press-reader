@@ -42,9 +42,8 @@ class DownloadsPanel extends HTMLElement {
   }
 
   spanEvent = function (event) {
-    let code = event.target.getAttribute("code");
-    let date = event.target.getAttribute("date");
-
+    let code = event.currentTarget.closest("div.titleProgress").getAttribute("code");
+    let date = event.currentTarget.closest("div.titleProgress").getAttribute("date");
     document.getElementById("nav-side-panel").open = false;
 
     document.getElementById("book-side-panel").setAttribute("code", code);

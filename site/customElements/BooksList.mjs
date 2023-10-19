@@ -49,13 +49,17 @@ class BooksList extends HTMLElement {
         .button {
           padding: 10px;
           border-radius: 5px;
-          flex-basis: 150px; 
+          flex-basis: 140px; 
           flex-grow: 0; 
           flex-shrink: 0;
           font-family: Segoe UI;
           color: white;
           font-weight: bold;
           border: 2px solid lightgray;
+        }
+        ul {
+          padding: 0px;
+          margin: 0px;
         }
         .button[selected] {
           border: 2px solid rgb(100,50,50);
@@ -79,21 +83,26 @@ class BooksList extends HTMLElement {
         .button-15 { background-color: #932800; }
 
         .books {
-          margin-left: 60px; 
-          margin-right: 60px; 
+          margin-left: 0px; 
+          margin-right: 0px; 
+          justify-content: center; 
           list-style-type: none; 
           display: flex; 
           flex-direction: row; 
-          gap: 30px; 
+          gap: 25px; 
           flex-wrap: wrap;
         }
         .groups {
+          margin-top: 10px;
+          margin-left: 4px; 
+          margin-right: 4px; 
           justify-content: center; 
           list-style-type: none; 
           display: flex; 
           flex-direction: row; 
           gap: 10px; 
           flex-wrap: wrap;
+          margin-bottom: 10px;
         }
       </style>
       <div class="main">

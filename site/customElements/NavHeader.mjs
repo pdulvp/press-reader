@@ -66,7 +66,6 @@ class NavHeader extends HTMLElement {
         }
         @media(max-width: 900px) { 
           ::slotted(a) {
-            display: none;
           }
         }
 

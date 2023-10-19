@@ -67,6 +67,8 @@ class BookPanel extends HTMLElement {
   onOpen = function () {
     let code = document.getElementById("book-side-panel").getAttribute("code");
     let date = document.getElementById("book-side-panel").getAttribute("date");
+    let img = this.shadowRoot.querySelector("img-status");
+    if (img) img.src = `/thumb?code=${code}&date=${date}&time=` + new Date().getTime();
     api.fetch.status([{ code: code, date: date }]).then(e => {
       this.status = e[0].status;
       this.connectedCallback();
