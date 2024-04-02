@@ -68,7 +68,7 @@ function proceedRequest(request, res) {
   console.log(url.pathname + " " + url.searchParams);
 
   let rules = {
-    code: (code) => { return { status: code != null && code.match(/^[a-zA-Z0-9_]+$/) != null, msg: "code invalid format" } },
+    code: (code) => { return { status: code != null && code.match(/^[a-zA-Z0-9_-]+$/) != null, msg: "code invalid format" } },
     date: (date) => { return { status: date != null && date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) != null, msg: "date invalid format" } },
     download: {
       type: (type) => { return { status: type == "cover" || type == "full" || type == null, msg: "type invalid format" } }
@@ -157,8 +157,8 @@ function proceedRequest(request, res) {
   }
 }
 
-const hostname = "192.168.1.18";
-//const hostname = "127.0.0.1";
+//const hostname = "192.168.1.18";
+const hostname = "127.0.0.1";
 const port = 8098;
 const server = http.createServer();
 
