@@ -32,19 +32,23 @@ var fsh = {
     });
   },
 
-  write: function (filename, data) {
+  write: function (filename, data, type = "UTF-8") {
     return new Promise(function (resolve, reject) {
       if (!(typeof data === 'string' || data instanceof String || data instanceof Buffer)) {
         data = JSON.stringify(data, null, " ");
       }
-      if (!fs.existsSync(path.dirname(filename))) {
-        fs.mkdirSync(path.dirname(filename), { recursive: true });
-      }
-      fs.writeFile(filename, data, 'UTF-8', function (err) {
+      fs.mkdir(path.dirname(filename), { recursive: true }, (err) => {
         if (err) {
           reject(err);
         } else {
-          resolve(data);
+          fs.writeFile(filename, data, type, function (err) {
+            if (err) {
+              console.log(filename);
+              reject(err);
+            } else {
+              resolve(data);
+            }
+          })
         }
       });
     });
