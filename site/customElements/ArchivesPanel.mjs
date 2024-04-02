@@ -28,7 +28,7 @@ class ArchivesPanel extends HTMLElement {
       let date = document.getElementById("book-side-panel").getAttribute("date");
       api.archives(code, date).then(d => {
         api.fetch.status(d).then(e => {
-          dwn.archives = e.slice(0, 10);
+          dwn.archives = e.slice(0, 20);
           dwn.connectedCallback();
         })
       });
