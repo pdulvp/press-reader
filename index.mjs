@@ -127,9 +127,9 @@ function proceedRequest(request, res) {
   } else if (url.pathname == '/read') {
     let { code, date } = urlh.params(url, { code: rules.code, date: rules.date });
     api.fetch.read(code, date).then(r => {
-      if (r.status == undefined) {
-        processor.writeHead("Content-Disposition", "attachment;filename=" + code + date + ".cbz");
-        processor.end(res, r, ContentTypes.cbz);
+      if (r.status == undefined) {//TODO PDF
+        processor.writeHead("Content-Disposition", "attachment;filename=" + code + date + "." + r.type);
+        processor.end(res, r.data, r.type == "cbz" ? ContentTypes.cbz: ContentTypes.pdf);
       } else {
         processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
       }

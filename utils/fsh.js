@@ -20,6 +20,18 @@ var fsh = {
     });
   },
 
+  mkdir: function (path) {
+    return new Promise(function (resolve, reject) {
+      fs.mkdir(path, { recursive: true }, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  },
+
   move: function (oldPath, newPath) {
     return new Promise(function (resolve, reject) {
       fs.rename(oldPath, newPath, function (err) {
