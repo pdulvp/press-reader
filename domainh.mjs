@@ -46,7 +46,7 @@ function unaryStatus(code, date) {
   if (fsh.fileExists(outputFile)) {
     return Promise.resolve({ status: "complete" });
   }
-
+ 
   let download = findDownload(code, date, false);
   if (download != null) {
     if (download.inProgress) {
@@ -205,11 +205,12 @@ function getThumbnail(code, date) {
         });
       } else {
         accessorh.getThumbnail(code, date).then(imageData => {
-          fs.writeFileSync(thumb, imageData, "binary");
+          fsh.write(thumb, imageData, "binary");
           thumb = `results/${code}/thumbnail.png`;
-          fs.writeFileSync(thumb, imageData, "binary");
+          fsh.write(thumb, imageData, "binary");
           resolve({ status: "date", thumbnail: imageData });
         }).catch(e => {
+          console.log(e);
           reject();
         });
       }
