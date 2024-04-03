@@ -4,7 +4,6 @@ import promiseh from "./utils/promiseh.js";
 import fs from "fs";
 import { dateh } from "./site/dateh.mjs";
 import ziph from "./utils/ziph.js";
-import path from "path";
 let currentDownloads = [];
 let accessorh = null;
 
@@ -170,18 +169,21 @@ function download(code, date, type = null) {
           download.current++;
 
           return accessorh.getImage(imageId).then(tt => {
-            return fsh.write(imageFile, tt).then(e => {
-              console.log('The file has been saved!');
-              return Promise.resolve(true);
-            });
+            return fsh.write(imageFile, tt);
+          }).then(e => {
+            console.log('The file has been saved!');
+            return Promise.resolve(true);
           }).then(ee => {
             if (download.total == download.current) {
-              searchDownloadedPages(folder).then(files => {
-                ziph.createZip(files, outputFile);
+              return searchDownloadedPages(folder).then(files => {
+                return ziph.createZip(files, outputFile);
+              }).then(e => {
                 download.inProgress = false;
+                return Promise.resolve(true);
               });
             } else if (i == remainingPages.length - 1) {
               download.inProgress = false;
+              return Promise.resolve(true);
             }
           });
         }), type == "cover");
@@ -193,19 +195,26 @@ function download(code, date, type = null) {
       let fullFolder = `${folder}`;
       return accessorh.getFull(code, date).then(res => {
         return fsh.mkdir(fullFolder).then(e => {
-          return ziph.unzipDomain(res, fullFolder, outputFileNamePDF);
+          return ziph.unzipDomain(res, fullFolder, outputFileNamePDF, (total, progress) => {
+            download.total = total;
+            download.current = Math.floor(progress / 2);
+          });
         });
       }).then(e => {
-        console.log('The file has been saved!');
+        console.log('The pages has been saved!');
         return searchDownloadedPages(folder);
       }).then(files => {
-        download.inProgress = false;
         if (files == 0) {
           return Promise.resolve({ status: "complete" });
         }
-        download.total = files.length;
-        download.current = files.length;
-        return ziph.createZip(files, outputFile);
+        return ziph.createZip(files, outputFile, (total, progress) => {
+          download.current = Math.floor(download.total / 2) + Math.floor(progress / 2);
+        });
+      }).then(e => {
+        console.log('The pdf has been saved!');
+        download.inProgress = false;
+        download.current = download.total;
+        return Promise.resolve({ status: "complete" });
       });
     });
   }
