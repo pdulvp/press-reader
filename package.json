@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "sample": "node index.mjs site/accessorh/sampleh.mjs",
+    "abandonware": "node index.mjs accessorh/abandonwareh.mjs",
     "europresse": "node index.mjs accessorh/europresseh.mjs",
     "test": "node --version",
+    "test4": "node accessorh/abandonwareh.test.mjs",
     "test2": "node site/customElements/SpinProgress.test.mjs",
     "test3": "node index"
   },
