@@ -4,18 +4,89 @@ import fDomainh from "./domainh.mjs";
 import requesth from "./utils/requesth.js"
 import urlh from './utils/urlh.js';
 import consoleh from './utils/consoleh.js';
+import promiseh from './utils/promiseh.js';
 
-if (process.argv[2] == undefined) {
+let accessors = process.argv.slice(2);
+if (accessors.length == 0) {
   console.log("An accessor to a press service is required");
   process.exit();
 }
-if (!fs.existsSync("./" + process.argv[2])) {
-  console.log("The specified accessor doesn't exist");
+
+let unaccessibleAccessors = accessors.filter(a => !fs.existsSync("./" + a));
+if (unaccessibleAccessors.length > 0) {
+  console.log("The specified accessors doesn't exist:" + unaccessibleAccessors);
   process.exit();
 }
 
-const module = await import("./" + process.argv[2]);
-var accessorh = module.default;
+function combine(accessorhs) {
+  let coveringAccessor = {};
+  let cover = (code) => {
+    if (Object.keys(coveringAccessor).length == 0) {
+      return Promise.all(accessorhs.map(a => a.getBooks())).then(bookResults => {
+        bookResults.forEach((books, index) => books.forEach(book => coveringAccessor[book.code] = accessorhs[index]));
+        console.log(code+"="+coveringAccessor[code].name);
+        return Promise.resolve(coveringAccessor[code]);
+      });
+    } else {
+      console.log(code+"="+coveringAccessor[code].name);
+      return Promise.resolve(coveringAccessor[code]);
+    }
+  }
+  return {
+    getBooks: () => {
+      return Promise.all(accessorhs.map(a => a.getBooks())).then(books => {
+        return Promise.resolve(books.reduce((o,i) => o.concat(i), []));
+      });
+    },
+    getPages: (code, date) => {
+      return cover(code).then(accessor => {
+        if (accessor) return accessor.getPages(code, date);
+        return Promise.reject("unsupported code");
+      } );
+    },
+    getArchives: (code) => {
+      return cover(code).then(accessor => {
+        if (accessor) return accessor.getArchives(code);
+        return Promise.reject("unsupported code");
+      } );
+    },
+    getImage: (code, imageId) => {
+      return cover(code).then(accessor => {
+        if (accessor) return accessor.getImage(code, imageId);
+        return Promise.reject("unsupported code");
+      } );
+    },
+    getFull: (code, date) => {
+      return cover(code).then(accessor => {
+        if (accessor) return accessor.getFull(code, date);
+        return Promise.reject("unsupported code");
+      } );
+    },
+    isFull: (code) => {
+      return cover(code).then(accessor => {
+        if (accessor) return accessor.isFull(code);
+        return Promise.reject("unsupported code");
+      } );
+    },
+    getThumbnail: (code, date) => {
+      return cover(code).then(accessor => {
+        if (accessor) return accessor.getThumbnail(code, date);
+        return Promise.reject("unsupported code");
+      } );
+    },
+  }
+}
+
+console.log(accessors);
+let accessorModules = [];
+for (let i=0; i<accessors.length; i++) {
+  const module = await import("./" + accessors[i]);
+  accessorModules.push(module.default);
+}
+
+console.log("Loaded accessors: " + accessors);
+console.log("Loaded accessor modules: " + accessorModules);
+let accessorh = combine(accessorModules);
 var domainh = fDomainh(accessorh);
 
 var api = {
