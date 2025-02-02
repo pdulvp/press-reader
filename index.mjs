@@ -5,6 +5,7 @@ import requesth from "./utils/requesth.js"
 import urlh from './utils/urlh.js';
 import consoleh from './utils/consoleh.js';
 import promiseh from './utils/promiseh.js';
+import { ContentTypes } from "./ContentTypes.mts";
 
 let accessors = process.argv.slice(2);
 if (accessors.length == 0) {
@@ -104,23 +105,6 @@ var api = {
 
 console.log(api);
 
-var ContentTypes = {
-  cbz: { contentType: 'application/zip', encoding: "binary" },
-  cjs: { contentType: 'text/javascript', encoding: "utf-8" },
-  mjs: { contentType: 'text/javascript', encoding: "utf-8" },
-  js: { contentType: 'text/javascript', encoding: "utf-8" },
-  css: { contentType: 'text/css', encoding: "utf-8" },
-  woff2: { contentType: 'font/woff2', encoding: "binary" },
-  json: { contentType: 'application/json', encoding: "utf-8" },
-  png: { contentType: 'image/png', encoding: "binary" },
-  jpg: { contentType: 'image/jpg', encoding: "binary" },
-  pdf: { contentType: 'pdf', encoding: "binary" },
-  ttf: { contentType: 'font/ttf', encoding: "binary" },
-  html: { contentType: 'text/html; charset=utf-8', encoding: "utf-8" },
-  map: { contentType: 'text/plain', encoding: "utf-8" },
-  svg: { contentType: 'image/svg+xml', encoding: "utf-8" },
-};
-
 var processor = {
   head: {},
   writeHead: (type, value) => { processor.head[type] = value },
@@ -157,33 +141,33 @@ function proceedRequest(request, res) {
 
   let errorHandler = (e) => {
     consoleh.red(e);
-    processor.end(res, JSON.stringify({ status: "error", message: `An error occured. See logs` }, null, ""), ContentTypes.json);
+    processor.end(res, JSON.stringify({ status: "error", message: `An error occured. See logs` }, null, ""), ContentTypes.JSON);
   };
 
   if (modules.includes(file) || customElements.includes(file)) {
-    processor.end(res, fs.readFileSync("site/" + file + ".mjs"), ContentTypes.mjs);
+    processor.end(res, fs.readFileSync("site/" + file + ".mjs"), ContentTypes.MJS);
 
   } else if (css.includes(file)) {
-    processor.end(res, fs.readFileSync("site/" + file + ".css"), ContentTypes.css);
+    processor.end(res, fs.readFileSync("site/" + file + ".css"), ContentTypes.CSS);
 
   } else if (request.url == '/') {
-    processor.end(res, fs.readFileSync("site/index.html"), ContentTypes.html);
+    processor.end(res, fs.readFileSync("site/index.html"), ContentTypes.HTML);
 
   } else if (url.pathname == '/api/list') {
     api.list().then(e => {
-      processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
+      processor.end(res, JSON.stringify(e, null, ""), ContentTypes.JSON);
     }).catch(errorHandler);
 
   } else if (url.pathname == '/api/archives') {
     let { code } = urlh.params(url, { code: rules.code });
     api.archives(code).then(e => {
-      processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
+      processor.end(res, JSON.stringify(e, null, ""), ContentTypes.JSON);
     }).catch(errorHandler);
 
   } else if (url.pathname == '/api/status') {
     requesth.json(request).then(json => {
       api.fetch.status(json).then(e => {
-        processor.end(res, JSON.stringify(e, null, ""), ContentTypes.json);
+        processor.end(res, JSON.stringify(e, null, ""), ContentTypes.JSON);
       })
     }).catch(errorHandler);
 
@@ -192,7 +176,7 @@ function proceedRequest(request, res) {
     api.fetch.thumb(code, date).then(r => {
       processor.writeHead("Content-Disposition", "attachment;filename=" + code + date + ".png");
       processor.writeHead("X-Thumbnail-Status", r.status);
-      processor.end(res, r.thumbnail, ContentTypes.png);
+      processor.end(res, r.thumbnail, ContentTypes.PNG);
     }).catch(errorHandler);
 
   } else if (url.pathname == '/read') {
@@ -200,31 +184,31 @@ function proceedRequest(request, res) {
     api.fetch.read(code, date).then(r => {
       if (r.status == undefined) {//TODO PDF
         processor.writeHead("Content-Disposition", "attachment;filename=" + code + date + "." + r.type);
-        processor.end(res, r.data, r.type == "cbz" ? ContentTypes.cbz: ContentTypes.pdf);
+        processor.end(res, r.data, r.type == "cbz" ? ContentTypes.CBZ: ContentTypes.PDF);
       } else {
-        processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
+        processor.end(res, JSON.stringify(r, null, ""), ContentTypes.JSON);
       }
     }).catch(errorHandler);
 
   } else if (url.pathname == '/api/download') {
     let { code, date, type } = urlh.params(url, { code: rules.code, date: rules.date, type: rules.download.type });
     api.fetch.download(code, date, type).then(r => {
-      processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
+      processor.end(res, JSON.stringify(r, null, ""), ContentTypes.JSON);
     }).catch(errorHandler);
 
   } else if (url.pathname == '/api/downloads') {
     api.fetch.downloads(null).then(r => {
-      processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
+      processor.end(res, JSON.stringify(r, null, ""), ContentTypes.JSON);
     }).catch(errorHandler);
 
   } else if (url.pathname == '/api/stop') {
     let { code, date } = urlh.params(url, { code: rules.code, date: rules.date });
     api.fetch.stop(code, date).then(r => {
-      processor.end(res, JSON.stringify(r, null, ""), ContentTypes.json);
+      processor.end(res, JSON.stringify(r, null, ""), ContentTypes.JSON);
     }).catch(errorHandler);
 
   } else {
-    processor.end(res, JSON.stringify({ status: "error", message: `Unknown url: ${request.url}` }, null, ""), ContentTypes.json);
+    processor.end(res, JSON.stringify({ status: "error", message: `Unknown url: ${request.url}` }, null, ""), ContentTypes.JSON);
   }
 }
 
@@ -241,7 +225,7 @@ server.on("request", (request, res) => {
     proceedRequest(request, res);
   } catch (e) {
     consoleh.red(e);
-    processor.end(res, JSON.stringify({ status: "error", message: `An error occured. See logs` }, null, ""), ContentTypes.json);
+    processor.end(res, JSON.stringify({ status: "error", message: `An error occured. See logs` }, null, ""), ContentTypes.JSON);
   }
 });
 server.listen(port, hostname, () => {
