@@ -9,7 +9,7 @@ function formatDate(date, separator = '') {
   let dd = date.getDate();
   if (dd < 10) dd = '0' + dd;
   if (mm < 10) mm = '0' + mm;
-  return yyyy + separator + mm + separator + dd;
+  return [yyyy, mm, dd].join(separator);
 }
 
 function toReadable(date) {
