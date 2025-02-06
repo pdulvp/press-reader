@@ -1,16 +1,18 @@
-var consoleh = {
-  green(msg) {
+const consoleh =  {
+  green(msg: string): void {
     console.log('\u001b[' + 32 + 'm' + msg + '\u001b[0m');
   },
-  red(msg) {
+  red(msg: string): void {
     console.log('\u001b[' + 31 + 'm' + msg + '\u001b[0m');
   },
-  yellow(msg) {
+  yellow(msg: string): void {
     console.log('\u001b[' + 33 + 'm' + msg + '\u001b[0m');
   },
-  blue(msg) {
+  blue(msg: string): void {
     console.log('\u001b[' + 34 + 'm' + msg + '\u001b[0m');
   }
 }
 
-module.exports = consoleh;
+export {
+  consoleh
+}
