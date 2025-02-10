@@ -1,6 +1,6 @@
 # press-reader
 
-This application is useful when a press service provider is images for each pages of a press newspaper. It will download images and generates a PDF from it.
+This application is an alternative to Cafeyn.
 
 ## UI
 
