@@ -146,7 +146,7 @@ function read(code: Code, date: Date): Promise<FileResult> {
           ziph.createZip(files, outputPartialFile);
           resolve(outputPartialFile);
         } else {
-          reject({ status: "empty" });
+          reject(new Error("empty"));
         }
       });
     }
@@ -154,7 +154,7 @@ function read(code: Code, date: Date): Promise<FileResult> {
     return new Promise((resolve, reject) => {
       fs.readFile(e, "binary", (err, data) => {
         if (err) reject(err);
-        resolve({ type: e.endsWith(".cbz")? "cbz" : "pdf", data: data });
+        else resolve({ type: e.endsWith(".cbz")? "cbz" : "pdf", data: data });
       });
     });
   });
@@ -296,22 +296,23 @@ function getThumbnail(code: Code, date: Date): Promise<ThumbnailResult> {
       let thumb = `results/${code}/${date}/thumbnail.png`;
       if (fsh.fileExists(thumb)) {
         fs.readFile(thumb, "binary", (err, data) => {
-          resolve({ status: "date", thumbnail: data });
+          if (err) reject(err);
+          else resolve({ status: "date", thumbnail: data });
         });
       } else {
         accessorh.getThumbnail(code, date).then(imageData => {
           fsh.write(thumb, imageData, "binary");
           thumb = `results/${code}/thumbnail.png`;
           fsh.write(thumb, imageData, "binary");
-          resolve({ status: "date", thumbnail: imageData });
+          resolve({ status: "date", thumbnail: imageData.toString() });
         }).catch(e => {
           console.log(e);
-          reject();
+          reject(e);
         });
       }
 
     } else {
-      reject();
+      reject(new Error("thumbnail"));
     }
 
   }).catch(e => {
@@ -320,19 +321,21 @@ function getThumbnail(code: Code, date: Date): Promise<ThumbnailResult> {
         let thumb = `results/${code}/thumbnail.png`;
         if (fsh.fileExists(thumb)) {
           fs.readFile(thumb, "binary", (err, data) => {
-            resolve({ status: "cover", thumbnail: data });
+            if (err) reject(err);
+            else resolve({ status: "cover", thumbnail: data });
           });
         } else {
-          reject();
+          reject(e);
         }
       } else {
-        reject();
+        reject(e);
       }
     });
   }).catch(e => {
     return new Promise<ThumbnailResult>((resolve, reject) => {
       fs.readFile(`thumbnail.png`, "binary", (err, data) => {
-        resolve({ status: "default", thumbnail: data });
+        if (err) reject(err);
+        else resolve({ status: "default", thumbnail: data });
       });
     });
   })

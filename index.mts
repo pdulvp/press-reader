@@ -60,7 +60,7 @@ const rules: Rules = {
 };
 
 
-function proceedRequest(processor: RequestProcessor) {
+function proceedRequest(processor: RequestProcessor, onError: (e: Error) => void) {
 
   let allowedFiles = 
   [ "customElements/BooksList.mjs", 
@@ -93,20 +93,20 @@ function proceedRequest(processor: RequestProcessor) {
   } else if (url.pathname == '/api/list') {
     api.list().then(e => {
       processor.json(e);
-    }).catch((e) => { throw e });
+    }).catch((e) => { onError(e) });
 
   } else if (url.pathname == '/api/archives') {
     let { code } = urlh.params(url, { code: rules.code });
     api.archives(code).then(e => {
       processor.json(e);
-    }).catch((e) => { throw e });
+    }).catch((e) => { onError(e) });
 
   } else if (url.pathname == '/api/status') {
     processor.read.asJson().then(json => {
       api.fetch.status(json).then(e => {
         processor.json(e);
-      }).catch((e) => { throw e });
-    }).catch((e) => { throw e });
+      }).catch((e) => { onError(e) });
+    }).catch((e) => { onError(e) });
 
   } else if (url.pathname == '/thumb') {
     let { code, date } = urlh.params(url, { code: rules.code, date: rules.date });
@@ -114,31 +114,31 @@ function proceedRequest(processor: RequestProcessor) {
       processor.writeHead("Content-Disposition", `attachment;filename=${code}${date}.png`);
       processor.writeHead("X-Thumbnail-Status", r.status);
       processor.end(r.thumbnail, ContentTypes.PNG);
-    }).catch((e) => { throw e });
+    }).catch((e) => { onError(e) });
 
   } else if (url.pathname == '/read') {
     let { code, date } = urlh.params(url, { code: rules.code, date: rules.date });
     api.fetch.read(code, date).then(r => {
       processor.writeHead("Content-Disposition", `attachment;filename=${code}${date}.${r.type}`);
       processor.end(r.data, r.type == "cbz" ? ContentTypes.CBZ: ContentTypes.PDF);
-    }).catch((e) => { throw e });
+    }).catch((e) => { onError(e) });
 
   } else if (url.pathname == '/api/download') {
     let { code, date, type } = urlh.params(url, { code: rules.code, date: rules.date, type: rules.downloadType });
     api.fetch.download(code, date, "slice").then(r => { //type
       processor.json(r);
-    }).catch((e) => { throw e });
+    }).catch((e) => { onError(e) });
 
   } else if (url.pathname == '/api/downloads') {
     api.fetch.downloads(null).then(r => {
       processor.json(r);
-    }).catch((e) => { throw e });
+    }).catch((e) => { onError(e) });
 
   } else if (url.pathname == '/api/stop') {
     let { code, date } = urlh.params(url, { code: rules.code, date: rules.date });
     api.fetch.stop(code, date).then(r => {
       processor.json(r);
-    }).catch((e) => { throw e });
+    }).catch((e) => { onError(e) });
 
   } else {
     throw new Error(`Unknown url: ${processor.url}`);
@@ -152,8 +152,13 @@ const server = http.createServer();
 
 server.on("request", (request, res) => {
   var processor = createProcessor(request, res);
-  let onError = (e) => {
-    consoleh.red(e);
+  let onError = (e: Error): void => {
+    if (e.message) {
+      consoleh.red(e.message);
+    }
+    if (e.stack) {
+      consoleh.red(e.stack);
+    }
     processor.error(e);
   };
   res.on("error", e => {
@@ -161,7 +166,7 @@ server.on("request", (request, res) => {
   });
 
   try {
-    proceedRequest(processor);
+    proceedRequest(processor, onError);
   } catch (e) {
     onError(e);
   }
