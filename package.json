@@ -1,20 +1,30 @@
 {
-  "name": "press-reader",
-  "version": "1.0.0",
+  "name": "library-reader",
+  "version": "2025.02.12",
+  "node_version": "23.7.0",
+  "suffix": "",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "sample": "node index.mjs site/accessorh/sampleh.mjs",
-    "all": "node index.mjs accessorh/abandonwareh.mjs accessorh/europresseh.mjs",
-    "europresse": "node index.mjs accessorh/europresseh.mjs",
+    "ddd": "node  --experimental-transform-types index.mts",
+    "ddd2": "node  --experimental-transform-types utils/urlh.test.mts",
+    "sample": "node index.mts site/accessorh/sampleh.mjs",
+    "all": "node index.mts accessorh/abandonwareh.mts accessorh/europresseh.mts",
+    "europresse": "node index.mts accessorh/europresseh.mts",
     "test": "node --version",
     "test4": "node accessorh/abandonwareh.test.mjs",
     "test2": "node site/customElements/SpinProgress.test.mjs",
-    "test3": "node index"
+    "test3": "node index",
+    "build": "debian.exe run 'cd /mnt/c/Works/library-reader; if [ -f ./init.sh ]; then source ./init.sh; fi; ./make.sh'",
+    "push": "debian.exe run 'cd /mnt/c/Works/library-reader; if [ -f ./init.sh ]; then source ./init.sh; fi; ./push.sh'"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "pdulvp",
+  "license": "CC-BY-NC-ND-4.0",
   "dependencies": {
-    "adm-zip": "^0.5.10"
+    "adm-zip": "^0.5.10",
+    "pureimage": "^0.4.18"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0"
   }
 }

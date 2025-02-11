@@ -5,3 +5,11 @@
 /errors.log
 /output.log
 /token
+/output
+/accessorh
+/*.deb
+/*.xz
+/.tmp
+/.cache
+/init.sh
+/build

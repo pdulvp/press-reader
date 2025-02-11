@@ -1,4 +1,4 @@
-# press-reader
+# library-reader
 
 This application is an alternative to Cafeyn.
 

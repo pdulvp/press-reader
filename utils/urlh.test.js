@@ -1,4 +1,4 @@
-var urlh = require("./urlh");
+var urlh = require("./urlh.mts");
 var assert = require("assert");
 
 url = (obj) => {
